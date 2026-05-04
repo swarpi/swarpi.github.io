@@ -1,0 +1,42 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <p>
+    <a href="https://github.com/swarpi">GitHub</a>
+    <span class="separator">·</span>
+    <a href="/rss.xml">RSS</a>
+  </p>
+  <p class="copyright">&copy; {year}</p>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--color-border);
+    padding: 1.5rem var(--spacing);
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  p {
+    margin-bottom: 0.25rem;
+  }
+
+  .separator {
+    margin: 0 0.5rem;
+  }
+
+  a {
+    color: var(--color-text-muted);
+  }
+
+  a:hover {
+    color: var(--color-text);
+  }
+
+  .copyright {
+    margin-top: 0.5rem;
+  }
+</style>

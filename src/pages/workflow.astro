@@ -1,0 +1,101 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { fetchWorkflowContent, fetchWorkflowDiagram } from '@/lib/workflow-content';
+
+const content = await fetchWorkflowContent();
+const diagram = await fetchWorkflowDiagram();
+
+const formattedDate = content?.lastUpdated.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+function stripFrontmatter(markdown: string): string {
+  const frontmatterRegex = /^---\n[\s\S]*?\n---\n*/;
+  return markdown.replace(frontmatterRegex, '');
+}
+
+function markdownToHtml(markdown: string): string {
+  let html = markdown;
+
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  const lines = html.split('\n');
+  let result: string[] = [];
+  let inList = false;
+  let inParagraph = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('<h')) {
+      if (inList) { result.push('</ul>'); inList = false; }
+      if (inParagraph) { result.push('</p>'); inParagraph = false; }
+      result.push(trimmed);
+    } else if (trimmed.startsWith('- ')) {
+      if (inParagraph) { result.push('</p>'); inParagraph = false; }
+      if (!inList) { result.push('<ul>'); inList = true; }
+      result.push(`<li>${trimmed.slice(2)}</li>`);
+    } else if (trimmed === '') {
+      if (inList) { result.push('</ul>'); inList = false; }
+      if (inParagraph) { result.push('</p>'); inParagraph = false; }
+    } else {
+      if (inList) { result.push('</ul>'); inList = false; }
+      if (!inParagraph) { result.push('<p>'); inParagraph = true; }
+      else { result.push('<br/>'); }
+      result.push(trimmed);
+    }
+  }
+
+  if (inList) result.push('</ul>');
+  if (inParagraph) result.push('</p>');
+
+  return result.join('\n');
+}
+---
+
+<BaseLayout title="Workflow" description="How I work with AI agents to build software">
+  {content ? (
+    <>
+      <p class="updated text-muted text-small">Last updated: {formattedDate}</p>
+
+      {diagram && (
+        <div class="diagram" set:html={diagram} />
+      )}
+
+      <article class="content" set:html={markdownToHtml(stripFrontmatter(content.markdown))} />
+    </>
+  ) : (
+    <p>Unable to load workflow content. Please check back later.</p>
+  )}
+</BaseLayout>
+
+<style>
+  .updated {
+    margin-bottom: 2rem;
+  }
+
+  .diagram {
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: var(--color-bg-alt);
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+
+  .diagram :global(svg) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .content :global(h1:first-child) {
+    margin-top: 0;
+  }
+</style>

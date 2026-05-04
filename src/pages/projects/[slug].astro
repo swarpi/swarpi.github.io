@@ -1,0 +1,81 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { fetchShowcaseProjects } from '@/lib/github';
+
+export async function getStaticPaths() {
+  const projects = await fetchShowcaseProjects();
+
+  return projects.map((project) => ({
+    params: { slug: project.name },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+
+const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={project.name} description={project.description}>
+  <article>
+    <header>
+      <h1>{project.name}</h1>
+      <p class="description">{project.description}</p>
+      <div class="meta">
+        {project.language && <span class="language">{project.language}</span>}
+        <span>Updated {formattedDate}</span>
+        <a href={project.url} target="_blank" rel="noopener noreferrer">
+          View on GitHub
+        </a>
+      </div>
+    </header>
+
+    {project.readme && (
+      <section class="readme">
+        <h2>README</h2>
+        <pre><code>{project.readme}</code></pre>
+      </section>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  header {
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    margin-top: 0;
+  }
+
+  .description {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .language {
+    font-weight: 500;
+  }
+
+  .readme h2 {
+    font-size: 1.25rem;
+  }
+
+  .readme pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { fetchShowcaseProjects } from '@/lib/github';
+
+const projects = await fetchShowcaseProjects();
+---
+
+<BaseLayout title="Projects" description="Open source work and experiments">
+  <h1>Projects</h1>
+  <p class="intro">
+    Open source work and experiments. These are repositories I've tagged with
+    <code>showcase</code> on GitHub.
+  </p>
+
+  {projects.length > 0 ? (
+    <div class="project-grid">
+      {projects.map((project) => (
+        <ProjectCard project={project} />
+      ))}
+    </div>
+  ) : (
+    <p class="empty">No showcase projects yet. Check back soon.</p>
+  )}
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-top: 0;
+  }
+
+  .intro {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .project-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+</style>

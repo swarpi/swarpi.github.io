@@ -1,0 +1,72 @@
+---
+import type { ShowcaseProject } from '@/lib/github';
+
+interface Props {
+  project: ShowcaseProject;
+}
+
+const { project } = Astro.props;
+
+const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'short',
+});
+---
+
+<article class="project-card">
+  <h3>
+    <a href={project.url} target="_blank" rel="noopener noreferrer">
+      {project.name}
+    </a>
+  </h3>
+  <p class="description">{project.description}</p>
+  <div class="meta">
+    {project.language && <span class="language">{project.language}</span>}
+    <span class="updated">Updated {formattedDate}</span>
+  </div>
+</article>
+
+<style>
+  .project-card {
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background-color: var(--color-bg);
+    transition: border-color 0.15s ease;
+  }
+
+  .project-card:hover {
+    border-color: var(--color-accent);
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  h3 a {
+    color: var(--color-text);
+  }
+
+  h3 a:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .description {
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .language {
+    font-weight: 500;
+  }
+</style>

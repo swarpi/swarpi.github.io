@@ -1,0 +1,64 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Home">
+  <section class="intro">
+    <h1>Hi, I'm swarpi</h1>
+    <p class="tagline">
+      Software engineer. Building things with TypeScript, Python, and Java.
+    </p>
+  </section>
+
+  <section class="links">
+    <h2>Explore</h2>
+    <ul>
+      <li>
+        <a href="/workflow">My Workflow</a> — How I work with AI agents to build software
+      </li>
+      <li>
+        <a href="/projects">Projects</a> — Open source work and experiments
+      </li>
+      <li>
+        <a href="/writing">Writing</a> — Essays and notes
+      </li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .intro {
+    margin: 3rem 0;
+  }
+
+  h1 {
+    margin-top: 0;
+  }
+
+  .tagline {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+  }
+
+  .links {
+    margin-top: 2rem;
+  }
+
+  .links h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+  }
+
+  .links ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .links li {
+    margin-bottom: 0.75rem;
+  }
+
+  .links a {
+    font-weight: 500;
+  }
+</style>
