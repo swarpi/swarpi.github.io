@@ -25,6 +25,36 @@ export interface Orchestration {
   layout?: 'diamond' | 'horizontal' | 'vertical';
 }
 
+export interface Subcomponent {
+  name: string;
+  detail: string;
+}
+
+export interface ArchComponent {
+  id: string;
+  title: string;
+  description: string;
+  technology: string;
+  tier: 'client' | 'service' | 'engine' | 'data';
+  color: 'indigo' | 'amber' | 'green' | 'blue';
+  subcomponents?: Subcomponent[];
+}
+
+export interface ArchConnection {
+  from: string;
+  to: string;
+  label: string;
+  protocol: string;
+  style?: 'sync' | 'async' | 'stream';
+}
+
+export interface Architecture {
+  name: string;
+  description: string;
+  components: ArchComponent[];
+  connections: ArchConnection[];
+}
+
 export interface ProjectWithOrchestration {
   name: string;
   description: string;
@@ -33,6 +63,7 @@ export interface ProjectWithOrchestration {
   updatedAt: Date;
   stars: number;
   orchestration: Orchestration | null;
+  architecture: Architecture | null;
 }
 
 export async function fetchOrchestration(repoName: string): Promise<Orchestration | null> {
@@ -56,6 +87,24 @@ export async function fetchOrchestration(repoName: string): Promise<Orchestratio
 
     const content = await response.text();
     const parsed = yaml.load(content) as Orchestration;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchArchitecture(repoName: string): Promise<Architecture | null> {
+  try {
+    const response = await fetch(
+      `https://raw.githubusercontent.com/swarpi/${repoName}/main/architecture.yaml`
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const content = await response.text();
+    const parsed = yaml.load(content) as Architecture;
     return parsed;
   } catch {
     return null;
@@ -86,7 +135,10 @@ export async function fetchProjectsWithOrchestrations(): Promise<ProjectWithOrch
 
     const projects: ProjectWithOrchestration[] = await Promise.all(
       showcaseRepos.map(async (repo: any) => {
-        const orchestration = await fetchOrchestration(repo.name);
+        const [orchestration, architecture] = await Promise.all([
+          fetchOrchestration(repo.name),
+          fetchArchitecture(repo.name),
+        ]);
         return {
           name: repo.name,
           description: repo.description ?? 'No description',
@@ -95,6 +147,7 @@ export async function fetchProjectsWithOrchestrations(): Promise<ProjectWithOrch
           updatedAt: new Date(repo.updated_at),
           stars: repo.stargazers_count,
           orchestration,
+          architecture,
         };
       })
     );
