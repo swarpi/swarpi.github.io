@@ -1,5 +1,8 @@
 ---
-import WorkflowGraph from '@/components/WorkflowGraph';
+import ProjectGrid from '@/components/ProjectGrid';
+import { fetchProjectsWithOrchestrations } from '@/lib/orchestration';
+
+const projects = await fetchProjectsWithOrchestrations();
 ---
 
 <!doctype html>
@@ -7,15 +10,15 @@ import WorkflowGraph from '@/components/WorkflowGraph';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="How I work with AI agents to build software" />
+    <meta name="description" content="Agent orchestrations for my projects" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Workflow | swarpi</title>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { width: 100%; height: 100%; overflow: hidden; }
+      html, body { width: 100%; min-height: 100vh; background: oklch(0.97 0.008 80); }
     </style>
   </head>
   <body>
-    <WorkflowGraph client:load />
+    <ProjectGrid client:load projects={projects} />
   </body>
 </html>
