@@ -47,16 +47,14 @@ export async function fetchOrchestration(repoName: string): Promise<Orchestratio
 
   try {
     const response = await fetch(
-      `https://api.github.com/repos/swarpi/${repoName}/contents/orchestration.yaml`,
-      { headers }
+      `https://raw.githubusercontent.com/swarpi/${repoName}/main/orchestration.yaml`
     );
 
     if (!response.ok) {
       return null;
     }
 
-    const data = await response.json();
-    const content = atob(data.content);
+    const content = await response.text();
     const parsed = yaml.load(content) as Orchestration;
     return parsed;
   } catch {
