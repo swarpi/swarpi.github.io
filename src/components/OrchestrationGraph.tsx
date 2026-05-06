@@ -105,6 +105,58 @@ function DotGrid({ W, H }: { W: number; H: number }) {
   );
 }
 
+function getSmartPort(
+  fromPos: Position, toPos: Position,
+  nodeW: number, nodeH: number,
+): { source: Position; sourceDir: string; target: Position; targetDir: string } {
+  const fromCx = fromPos.x + nodeW / 2;
+  const fromCy = fromPos.y + nodeH / 2;
+  const toCx = toPos.x + nodeW / 2;
+  const toCy = toPos.y + nodeH / 2;
+  const dx = toCx - fromCx;
+  const dy = toCy - fromCy;
+  const hw = nodeW / 2;
+  const hh = nodeH / 2;
+
+  const pickSide = (cx: number, cy: number, otherCx: number, otherCy: number) => {
+    const ddx = otherCx - cx;
+    const ddy = otherCy - cy;
+    if (Math.abs(ddx / hw) > Math.abs(ddy / hh)) {
+      return ddx > 0
+        ? { point: { x: cx + hw, y: cy }, dir: 'right' }
+        : { point: { x: cx - hw, y: cy }, dir: 'left' };
+    }
+    return ddy > 0
+      ? { point: { x: cx, y: cy + hh }, dir: 'bottom' }
+      : { point: { x: cx, y: cy - hh }, dir: 'top' };
+  };
+
+  const src = pickSide(fromCx, fromCy, toCx, toCy);
+  const tgt = pickSide(toCx, toCy, fromCx, fromCy);
+  return { source: src.point, sourceDir: src.dir, target: tgt.point, targetDir: tgt.dir };
+}
+
+function ctrlOffset(distance: number, curvature: number): number {
+  return distance >= 0 ? 0.5 * distance : curvature * 25 * Math.sqrt(-distance);
+}
+
+function getControlPoint(dir: string, x: number, y: number, tx: number, ty: number, curvature: number): Position {
+  switch (dir) {
+    case 'left':   return { x: x - ctrlOffset(x - tx, curvature), y };
+    case 'right':  return { x: x + ctrlOffset(tx - x, curvature), y };
+    case 'top':    return { x, y: y - ctrlOffset(y - ty, curvature) };
+    case 'bottom': return { x, y: y + ctrlOffset(ty - y, curvature) };
+    default:       return { x, y };
+  }
+}
+
+function bezMid(sx: number, sy: number, cx1: number, cy1: number, cx2: number, cy2: number, tx: number, ty: number): Position {
+  return {
+    x: sx * 0.125 + cx1 * 0.375 + cx2 * 0.375 + tx * 0.125,
+    y: sy * 0.125 + cy1 * 0.375 + cy2 * 0.375 + ty * 0.125,
+  };
+}
+
 function ConnectionLayer({ positions, connections, agents }: { positions: Positions; connections: Connection[]; agents: Agent[] }) {
   if (Object.keys(positions).length === 0) return null;
 
@@ -113,65 +165,23 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
     return COLORS[agent?.color || 'indigo'];
   };
 
-  const nCx = (id: string) => positions[id]?.x + NODE_W / 2 || 0;
-  const nCy = (id: string) => positions[id]?.y + NODE_H / 2 || 0;
-  const top = (id: string) => ({ x: nCx(id), y: positions[id]?.y || 0 });
-  const bot = (id: string) => ({ x: nCx(id), y: (positions[id]?.y || 0) + NODE_H });
-  const left = (id: string) => ({ x: positions[id]?.x || 0, y: nCy(id) });
-  const right = (id: string) => ({ x: (positions[id]?.x || 0) + NODE_W, y: nCy(id) });
-
-  const bez = (p0: Position, c1: Position, c2: Position, p1: Position, t = 0.5) => ({
-    x: (1 - t) ** 3 * p0.x + 3 * (1 - t) ** 2 * t * c1.x + 3 * (1 - t) * t ** 2 * c2.x + t ** 3 * p1.x,
-    y: (1 - t) ** 3 * p0.y + 3 * (1 - t) ** 2 * t * c1.y + 3 * (1 - t) * t ** 2 * c2.y + t ** 3 * p1.y,
-  });
+  const CURVATURE = 0.25;
 
   const lines = connections.map((conn) => {
     const fromPos = positions[conn.from];
     const toPos = positions[conn.to];
     if (!fromPos || !toPos) return null;
 
-    const color = getColor(conn.type === 'feedback' ? conn.from : conn.from);
+    const color = getColor(conn.from);
     const isFeedback = conn.type === 'feedback';
 
-    // Determine best connection points based on relative positions
-    const dx = toPos.x - fromPos.x;
-    const dy = toPos.y - fromPos.y;
+    const { source, sourceDir, target, targetDir } = getSmartPort(fromPos, toPos, NODE_W, NODE_H);
 
-    let f: Position, p1: Position, c1: Position, c2: Position;
+    const c1 = getControlPoint(sourceDir, source.x, source.y, target.x, target.y, CURVATURE);
+    const c2 = getControlPoint(targetDir, target.x, target.y, source.x, source.y, CURVATURE);
 
-    if (isFeedback) {
-      // Feedback loops go below
-      f = bot(conn.from);
-      p1 = bot(conn.to);
-      const swing = 50;
-      c1 = { x: f.x + 20, y: f.y + swing };
-      c2 = { x: p1.x - 20, y: p1.y + swing };
-    } else if (Math.abs(dx) > Math.abs(dy)) {
-      // Horizontal connection
-      if (dx > 0) {
-        f = right(conn.from);
-        p1 = left(conn.to);
-      } else {
-        f = left(conn.from);
-        p1 = right(conn.to);
-      }
-      c1 = { x: f.x + (dx > 0 ? 60 : -60), y: f.y };
-      c2 = { x: p1.x + (dx > 0 ? -60 : 60), y: p1.y };
-    } else {
-      // Vertical connection
-      if (dy > 0) {
-        f = bot(conn.from);
-        p1 = top(conn.to);
-      } else {
-        f = top(conn.from);
-        p1 = bot(conn.to);
-      }
-      c1 = { x: f.x, y: f.y + (dy > 0 ? 60 : -60) };
-      c2 = { x: p1.x, y: p1.y + (dy > 0 ? -60 : 60) };
-    }
-
-    const d = `M${f.x},${f.y} C${c1.x},${c1.y} ${c2.x},${c2.y} ${p1.x},${p1.y}`;
-    const mid = bez(f, c1, c2, p1, 0.5);
+    const d = `M${source.x},${source.y} C${c1.x},${c1.y} ${c2.x},${c2.y} ${target.x},${target.y}`;
+    const mid = bezMid(source.x, source.y, c1.x, c1.y, c2.x, c2.y, target.x, target.y);
 
     return { d, mid, artifact: conn.artifact, color: color.main, isFeedback };
   }).filter(Boolean);
@@ -180,35 +190,26 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
     <svg style={{ position: 'absolute', left: 0, top: 0, width: 1, height: 1, pointerEvents: 'none', overflow: 'visible' }}>
       <defs>
         {Object.entries(COLORS).map(([name, color]) => (
-          <marker key={name} id={`arr-${name}`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-            <path d="M1 1l5 3-5 3" stroke={color.main} strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <marker key={name} id={`arr-${name}`} markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+            <path d="M1.5 1.5L7.5 5 1.5 8.5" stroke={color.main} strokeWidth="1.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </marker>
         ))}
-        <filter id="blur-line" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
       </defs>
 
       {lines.map((l, i) => l && (
         <g key={i}>
-          <path d={l.d} fill="none" stroke={l.color} strokeWidth="1" strokeDasharray="5 7" opacity={0.15} />
+          <path d={l.d} fill="none" stroke={l.color} strokeWidth="3" opacity={0.06} strokeLinecap="round" />
           <path
             d={l.d}
             fill="none"
             stroke={l.color}
-            strokeWidth="1.8"
-            strokeDasharray="6 8"
-            opacity="0.55"
+            strokeWidth="1.5"
+            opacity={l.isFeedback ? 0.35 : 0.5}
+            strokeLinecap="round"
+            strokeDasharray={l.isFeedback ? '4 6' : 'none'}
             markerEnd={`url(#arr-${l.isFeedback ? 'amber' : 'indigo'})`}
-            filter="url(#blur-line)"
-            className={l.isFeedback ? 'flow-line-reverse' : 'flow-line'}
-            style={{ animationDelay: `${i * 0.2}s` }}
           />
-          <foreignObject x={l.mid.x - 40} y={l.mid.y - 9} width="80" height="18">
+          <foreignObject x={l.mid.x - 40} y={l.mid.y - 9} width="80" height="18" style={{ overflow: 'visible' }}>
             <div
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
@@ -216,14 +217,14 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
                 lineHeight: 1,
                 padding: '3px 6px',
                 borderRadius: '9px',
-                background: 'oklch(1 0 0)',
+                background: 'oklch(1 0 0 / 0.9)',
                 border: `1px solid oklch(0.88 0.04 265)`,
                 color: l.color,
                 whiteSpace: 'nowrap',
                 textAlign: 'center',
                 boxShadow: '0 1px 3px oklch(0 0 0 / 0.06)',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                width: 'fit-content',
+                margin: '0 auto',
               }}
             >
               {l.artifact}
