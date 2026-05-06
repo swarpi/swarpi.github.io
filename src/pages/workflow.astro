@@ -1,5 +1,6 @@
 ---
 import ProjectGrid from '@/components/ProjectGrid';
+import ThemeToggle from '@/components/ThemeToggle.astro';
 import { fetchProjectsWithOrchestrations } from '@/lib/orchestration';
 
 const projects = await fetchProjectsWithOrchestrations();
@@ -13,12 +14,29 @@ const projects = await fetchProjectsWithOrchestrations();
     <meta name="description" content="Agent orchestrations for my projects" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Workflow | swarpi</title>
+    <script is:inline>
+      (function() {
+        var t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       html, body { width: 100%; min-height: 100vh; background: oklch(0.97 0.008 80); }
     </style>
   </head>
   <body>
+    <div class="theme-toggle-float">
+      <ThemeToggle />
+    </div>
     <ProjectGrid client:load projects={projects} />
+    <style>
+      .theme-toggle-float {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 100;
+      }
+    </style>
   </body>
 </html>
