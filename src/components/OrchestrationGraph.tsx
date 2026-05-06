@@ -566,14 +566,12 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     setDraggingId(id);
 
     const onMove = (ev: MouseEvent) => {
-      if (!dragRef.current) return;
+      const drag = dragRef.current;
+      if (!drag) return;
       didDragRef.current = true;
-      const newX = ev.clientX - dragRef.current.offsetX;
-      const newY = ev.clientY - dragRef.current.offsetY;
-      setPositions((prev) => ({
-        ...prev,
-        [dragRef.current!.id]: { x: newX, y: newY },
-      }));
+      const x = ev.clientX - drag.offsetX;
+      const y = ev.clientY - drag.offsetY;
+      setPositions((prev) => ({ ...prev, [drag.id]: { x, y } }));
     };
 
     const onUp = () => {

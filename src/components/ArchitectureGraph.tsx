@@ -419,15 +419,12 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
     setDraggingId(id);
 
     const onMove = (ev: MouseEvent) => {
-      if (!dragRef.current) return;
+      const drag = dragRef.current;
+      if (!drag) return;
       didDragRef.current = true;
-      setPositions((prev) => ({
-        ...prev,
-        [dragRef.current!.id]: {
-          x: ev.clientX - dragRef.current!.offsetX,
-          y: ev.clientY - dragRef.current!.offsetY,
-        },
-      }));
+      const x = ev.clientX - drag.offsetX;
+      const y = ev.clientY - drag.offsetY;
+      setPositions((prev) => ({ ...prev, [drag.id]: { x, y } }));
     };
 
     const onUp = () => {
