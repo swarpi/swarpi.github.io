@@ -71,8 +71,8 @@ const ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const NODE_W = 220;
-const NODE_H = 160;
+const NODE_W = 160;
+const NODE_H = 90;
 
 interface Position {
   x: number;
@@ -283,18 +283,18 @@ function NodeCard({
           height: '100%',
           background: active ? color.light : 'oklch(1 0 0)',
           border: `1.5px solid ${active ? color.main : C.border}`,
-          borderRadius: '14px',
-          padding: '16px',
+          borderRadius: '12px',
+          padding: '10px 12px',
           boxShadow: isDragging
-            ? `0 0 0 4px ${color.dim}, 0 16px 48px oklch(0 0 0 / 0.15)`
+            ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
             : active
-            ? `0 0 0 4px ${color.dim}, 0 8px 32px oklch(0 0 0 / 0.08)`
-            : '0 1px 4px oklch(0 0 0 / 0.05), 0 4px 16px oklch(0 0 0 / 0.04)',
+            ? `0 0 0 3px ${color.dim}, 0 6px 24px oklch(0 0 0 / 0.08)`
+            : '0 1px 4px oklch(0 0 0 / 0.05), 0 3px 12px oklch(0 0 0 / 0.04)',
           transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
-          transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-2px)' : 'translateY(0)',
+          transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-1px)' : 'translateY(0)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
+          gap: '6px',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -305,9 +305,9 @@ function NodeCard({
             top: 0,
             left: 0,
             right: 0,
-            height: '3px',
+            height: '2.5px',
             background: color.main,
-            borderRadius: '14px 14px 0 0',
+            borderRadius: '12px 12px 0 0',
             opacity: active ? 1 : 0.4,
           }}
         />
@@ -315,51 +315,39 @@ function NodeCard({
           <span
             style={{
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '9px',
+              fontSize: '8px',
               fontWeight: 500,
               color: color.main,
               background: color.dim,
               border: `1px solid ${color.border}`,
-              borderRadius: '5px',
-              padding: '2px 6px',
+              borderRadius: '4px',
+              padding: '1px 5px',
             }}
           >
             {String(index + 1).padStart(2, '0')}
           </span>
-          <span style={{ color: color.main }}>{icon}</span>
+          <span style={{ color: color.main, transform: 'scale(0.8)', transformOrigin: 'right center' }}>{icon}</span>
         </div>
-        <div>
-          <div
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '17px',
-              fontWeight: 700,
-              color: C.textPrimary,
-              marginBottom: '3px',
-            }}
-          >
-            {agent.title}
-          </div>
-          <div
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: '11px',
-              color: C.textDim,
-              lineHeight: 1.4,
-            }}
-          >
-            {agent.tagline}
-          </div>
+        <div
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: '13px',
+            fontWeight: 700,
+            color: C.textPrimary,
+            lineHeight: 1.2,
+          }}
+        >
+          {agent.title}
         </div>
-        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto' }}>
+        <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: 'auto' }}>
           {agent.outputs.slice(0, 3).map((o) => (
             <span
               key={o}
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '8.5px',
-                padding: '2px 6px',
-                borderRadius: '10px',
+                fontSize: '7.5px',
+                padding: '1px 5px',
+                borderRadius: '8px',
                 background: color.light,
                 color: color.main,
                 border: `1px solid ${color.border}`,

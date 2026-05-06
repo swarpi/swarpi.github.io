@@ -39,8 +39,8 @@ const C = {
 const TIER_ORDER: Record<string, number> = { client: 0, service: 1, engine: 2, data: 3 };
 const TIER_LABELS: Record<string, string> = { client: 'Client', service: 'Service', engine: 'Engine', data: 'Data' };
 
-const NODE_W = 240;
-const NODE_H = 180;
+const NODE_W = 170;
+const NODE_H = 100;
 
 interface Position { x: number; y: number }
 interface Positions { [key: string]: Position }
@@ -215,75 +215,67 @@ function ComponentNode({
         width: '100%',
         background: active ? color.light : 'oklch(1 0 0)',
         border: `1.5px solid ${active ? color.main : C.border}`,
-        borderRadius: '14px',
-        padding: '16px',
+        borderRadius: '12px',
+        padding: '10px 12px',
         boxShadow: isDragging
-          ? `0 0 0 4px ${color.dim}, 0 16px 48px oklch(0 0 0 / 0.15)`
+          ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
           : active
-          ? `0 0 0 4px ${color.dim}, 0 8px 32px oklch(0 0 0 / 0.08)`
-          : '0 1px 4px oklch(0 0 0 / 0.05), 0 4px 16px oklch(0 0 0 / 0.04)',
+          ? `0 0 0 3px ${color.dim}, 0 6px 24px oklch(0 0 0 / 0.08)`
+          : '0 1px 4px oklch(0 0 0 / 0.05), 0 3px 12px oklch(0 0 0 / 0.04)',
         transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
-        transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-2px)' : 'translateY(0)',
+        transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-1px)' : 'translateY(0)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px',
+        gap: '5px',
         position: 'relative',
         overflow: 'hidden',
       }}>
         <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
-          background: color.main, borderRadius: '14px 14px 0 0', opacity: active ? 1 : 0.4,
+          position: 'absolute', top: 0, left: 0, right: 0, height: '2.5px',
+          background: color.main, borderRadius: '12px 12px 0 0', opacity: active ? 1 : 0.4,
         }} />
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{
-            fontFamily: "'JetBrains Mono', monospace", fontSize: '9px', fontWeight: 500,
+            fontFamily: "'JetBrains Mono', monospace", fontSize: '8px', fontWeight: 500,
             color: color.main, background: color.dim, border: `1px solid ${color.border}`,
-            borderRadius: '5px', padding: '2px 6px',
+            borderRadius: '4px', padding: '1px 5px',
           }}>
             {TIER_LABELS[component.tier] || component.tier}
           </span>
           <span style={{
-            fontFamily: "'JetBrains Mono', monospace", fontSize: '9px',
+            fontFamily: "'JetBrains Mono', monospace", fontSize: '8px',
             color: C.textDim,
           }}>
             {component.technology}
           </span>
         </div>
 
-        <div>
-          <div style={{
-            fontFamily: "'Space Grotesk', sans-serif", fontSize: '17px', fontWeight: 700,
-            color: C.textPrimary, marginBottom: '3px',
-          }}>
-            {component.title}
-          </div>
-          <div style={{
-            fontFamily: "'Space Grotesk', sans-serif", fontSize: '11px',
-            color: C.textDim, lineHeight: 1.4,
-          }}>
-            {component.description}
-          </div>
+        <div style={{
+          fontFamily: "'Space Grotesk', sans-serif", fontSize: '13px', fontWeight: 700,
+          color: C.textPrimary, lineHeight: 1.2,
+        }}>
+          {component.title}
         </div>
 
         {component.subcomponents && component.subcomponents.length > 0 && (
-          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: 'auto' }}>
-            {component.subcomponents.slice(0, 3).map((sub) => (
+          <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: 'auto' }}>
+            {component.subcomponents.slice(0, 2).map((sub) => (
               <span key={sub.name} style={{
-                fontFamily: "'JetBrains Mono', monospace", fontSize: '8.5px',
-                padding: '2px 6px', borderRadius: '10px',
+                fontFamily: "'JetBrains Mono', monospace", fontSize: '7.5px',
+                padding: '1px 5px', borderRadius: '8px',
                 background: color.light, color: color.main, border: `1px solid ${color.border}`,
               }}>
                 {sub.name}
               </span>
             ))}
-            {component.subcomponents.length > 3 && (
+            {component.subcomponents.length > 2 && (
               <span style={{
-                fontFamily: "'JetBrains Mono', monospace", fontSize: '8.5px',
-                padding: '2px 6px', borderRadius: '10px',
+                fontFamily: "'JetBrains Mono', monospace", fontSize: '7.5px',
+                padding: '1px 5px', borderRadius: '8px',
                 background: color.light, color: color.main, border: `1px solid ${color.border}`,
               }}>
-                +{component.subcomponents.length - 3}
+                +{component.subcomponents.length - 2}
               </span>
             )}
           </div>
@@ -436,14 +428,14 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
     );
 
     const totalTiers = sortedTiers.length;
-    const tierSpacing = Math.min(H * 0.22, 220);
+    const tierSpacing = Math.min(H * 0.18, 160);
     const startY = (H - (totalTiers - 1) * tierSpacing) / 2 - NODE_H / 2 + 20;
 
     const newPositions: Positions = {};
 
     sortedTiers.forEach(([, comps], tierIdx) => {
       const y = startY + tierIdx * tierSpacing;
-      const spacing = Math.min(W * 0.22, 280);
+      const spacing = Math.min(W * 0.18, 220);
       const startX = (W - (comps.length - 1) * spacing) / 2 - NODE_W / 2;
 
       comps.forEach((comp, i) => {
