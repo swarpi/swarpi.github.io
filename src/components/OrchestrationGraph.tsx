@@ -574,7 +574,8 @@ export default function OrchestrationGraph({ orchestration, projectName, project
   const [dims, setDims] = useState({ W: 1200, H: 800 });
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const dragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
-  const didDragRef = useRef(false);
+  const dragDistRef = useRef(0);
+  const DRAG_THRESHOLD = 3;
   const containerRef = useRef<HTMLDivElement>(null);
 
   const INITIAL_SCALE = 1.1;
@@ -595,13 +596,15 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     if (!pos) return;
     const canvas = toCanvas(e.clientX, e.clientY);
     dragRef.current = { id, offsetX: canvas.x - pos.x, offsetY: canvas.y - pos.y };
-    didDragRef.current = false;
+    dragDistRef.current = 0;
+    const startX = e.clientX;
+    const startY = e.clientY;
     setDraggingId(id);
 
     const onMove = (ev: MouseEvent) => {
       const drag = dragRef.current;
       if (!drag) return;
-      didDragRef.current = true;
+      dragDistRef.current = Math.max(dragDistRef.current, Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY));
       const c = toCanvas(ev.clientX, ev.clientY);
       setPositions((prev) => ({ ...prev, [drag.id]: { x: c.x - drag.offsetX, y: c.y - drag.offsetY } }));
     };
@@ -621,11 +624,13 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     if ((e.target as HTMLElement).closest('[data-node-id]')) return;
     e.preventDefault();
     panDragRef.current = { startX: e.clientX - panRef.current.x, startY: e.clientY - panRef.current.y };
-    didDragRef.current = false;
+    dragDistRef.current = 0;
+    const startX = e.clientX;
+    const startY = e.clientY;
 
     const onMove = (ev: MouseEvent) => {
       if (!panDragRef.current) return;
-      didDragRef.current = true;
+      dragDistRef.current = Math.max(dragDistRef.current, Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY));
       panRef.current = { x: ev.clientX - panDragRef.current.startX, y: ev.clientY - panDragRef.current.startY };
       rerender();
     };
@@ -801,7 +806,7 @@ export default function OrchestrationGraph({ orchestration, projectName, project
               index={i}
               pos={positions[agent.id]}
               selected={selected === agent.id}
-              onClick={(id) => { if (!didDragRef.current) setSelected((prev) => (prev === id ? null : id)); }}
+              onClick={(id) => { if (dragDistRef.current < DRAG_THRESHOLD) setSelected((prev) => (prev === id ? null : id)); }}
               onDrag={handleDragStart}
               isDragging={draggingId === agent.id}
             />
