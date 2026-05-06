@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Orchestration, Agent, Connection } from '../lib/orchestration';
 
 const COLORS = {
@@ -233,18 +233,47 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
   );
 }
 
+function DragHandle({ color, onDragStart }: { color: string; onDragStart: (e: React.MouseEvent) => void }) {
+  return (
+    <div
+      onMouseDown={(e) => { e.stopPropagation(); onDragStart(e); }}
+      style={{
+        position: 'absolute', top: 8, right: 8, width: 22, height: 22,
+        borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'grab', zIndex: 10, opacity: 0.4, transition: 'opacity 0.15s',
+        background: 'transparent',
+      }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.4'; }}
+    >
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <circle cx="4" cy="3" r="1" fill={color} />
+        <circle cx="8" cy="3" r="1" fill={color} />
+        <circle cx="4" cy="6" r="1" fill={color} />
+        <circle cx="8" cy="6" r="1" fill={color} />
+        <circle cx="4" cy="9" r="1" fill={color} />
+        <circle cx="8" cy="9" r="1" fill={color} />
+      </svg>
+    </div>
+  );
+}
+
 function NodeCard({
   agent,
   index,
   pos,
   selected,
   onClick,
+  onDrag,
+  isDragging,
 }: {
   agent: Agent;
   index: number;
   pos: Position;
   selected: boolean;
   onClick: (id: string) => void;
+  onDrag: (id: string, e: React.MouseEvent) => void;
+  isDragging: boolean;
 }) {
   const color = COLORS[agent.color || 'indigo'];
   const [hovered, setHovered] = useState(false);
@@ -260,7 +289,7 @@ function NodeCard({
         width: NODE_W,
         height: NODE_H,
         cursor: 'pointer',
-        animation: `nodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
+        animation: isDragging ? 'none' : `nodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
       }}
       onClick={() => onClick(agent.id)}
       onMouseEnter={() => setHovered(true)}
@@ -274,11 +303,13 @@ function NodeCard({
           border: `1.5px solid ${active ? color.main : C.border}`,
           borderRadius: '14px',
           padding: '16px',
-          boxShadow: active
+          boxShadow: isDragging
+            ? `0 0 0 4px ${color.dim}, 0 16px 48px oklch(0 0 0 / 0.15)`
+            : active
             ? `0 0 0 4px ${color.dim}, 0 8px 32px oklch(0 0 0 / 0.08)`
             : '0 1px 4px oklch(0 0 0 / 0.05), 0 4px 16px oklch(0 0 0 / 0.04)',
-          transition: 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
-          transform: active ? 'translateY(-2px)' : 'translateY(0)',
+          transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
+          transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-2px)' : 'translateY(0)',
           display: 'flex',
           flexDirection: 'column',
           gap: '8px',
@@ -286,6 +317,7 @@ function NodeCard({
           overflow: 'hidden',
         }}
       >
+        <DragHandle color={color.main} onDragStart={(e) => onDrag(agent.id, e)} />
         <div
           style={{
             position: 'absolute',
@@ -519,6 +551,36 @@ export default function OrchestrationGraph({ orchestration, projectName, project
   const [selected, setSelected] = useState<string | null>(null);
   const [positions, setPositions] = useState<Positions>({});
   const [dims, setDims] = useState({ W: 1200, H: 800 });
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const dragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
+
+  const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
+    const pos = positions[id];
+    if (!pos) return;
+    dragRef.current = { id, offsetX: e.clientX - pos.x, offsetY: e.clientY - pos.y };
+    setDraggingId(id);
+
+    const onMove = (ev: MouseEvent) => {
+      if (!dragRef.current) return;
+      setPositions((prev) => ({
+        ...prev,
+        [dragRef.current!.id]: {
+          x: ev.clientX - dragRef.current!.offsetX,
+          y: ev.clientY - dragRef.current!.offsetY,
+        },
+      }));
+    };
+
+    const onUp = () => {
+      dragRef.current = null;
+      setDraggingId(null);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [positions]);
 
   const compute = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -695,7 +757,9 @@ export default function OrchestrationGraph({ orchestration, projectName, project
             index={i}
             pos={positions[agent.id]}
             selected={selected === agent.id}
-            onClick={(id) => setSelected((prev) => (prev === id ? null : id))}
+            onClick={(id) => { if (!draggingId) setSelected((prev) => (prev === id ? null : id)); }}
+            onDrag={handleDragStart}
+            isDragging={draggingId === agent.id}
           />
         ) : null
       )}
@@ -733,6 +797,8 @@ export default function OrchestrationGraph({ orchestration, projectName, project
       >
         <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>click</span>
         agent to inspect ·
+        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>drag</span>
+        to rearrange ·
         <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>esc</span>
         to go back
       </div>
