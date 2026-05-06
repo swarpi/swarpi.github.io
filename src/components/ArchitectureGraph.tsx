@@ -42,6 +42,83 @@ const TIER_LABELS: Record<string, string> = { client: 'Client', service: 'Servic
 const NODE_W = 170;
 const NODE_H = 100;
 
+type TierShape = 'rounded' | 'angular' | 'cylinder' | 'card';
+
+function getTierShape(tier: string): TierShape {
+  switch (tier) {
+    case 'client':  return 'rounded';
+    case 'engine':  return 'angular';
+    case 'data':    return 'cylinder';
+    default:        return 'card';
+  }
+}
+
+function tierShapeStyles(
+  tier: TierShape,
+  color: typeof COLORS[keyof typeof COLORS],
+  active: boolean,
+  isDragging: boolean,
+) {
+  const base = {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '5px',
+    position: 'relative' as const,
+    overflow: 'hidden' as const,
+    transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
+    transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-1px)' : 'translateY(0)',
+  };
+
+  const shadow = isDragging
+    ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
+    : active
+    ? `0 0 0 3px ${color.dim}, 0 6px 24px oklch(0 0 0 / 0.08)`
+    : '0 1px 4px oklch(0 0 0 / 0.05), 0 3px 12px oklch(0 0 0 / 0.04)';
+
+  switch (tier) {
+    case 'rounded':
+      return {
+        ...base,
+        background: active ? color.light : 'oklch(1 0 0)',
+        border: `1.5px solid ${active ? color.main : C.border}`,
+        borderRadius: '20px',
+        padding: '10px 14px',
+        boxShadow: shadow,
+      };
+    case 'angular':
+      return {
+        ...base,
+        background: active ? color.light : 'oklch(1 0 0)',
+        border: `1.5px solid ${active ? color.main : C.border}`,
+        borderRadius: '4px 14px 4px 14px',
+        padding: '10px 12px',
+        boxShadow: shadow,
+      };
+    case 'cylinder':
+      return {
+        ...base,
+        background: active ? color.light : 'oklch(1 0 0)',
+        border: `1.5px solid ${active ? color.main : C.border}`,
+        borderRadius: '12px',
+        padding: '14px 12px 10px',
+        boxShadow: shadow,
+        borderTop: `3px solid ${color.main}`,
+        borderBottom: `3px solid ${color.main}`,
+      };
+    default:
+      return {
+        ...base,
+        background: active ? color.light : 'oklch(1 0 0)',
+        border: `1.5px solid ${active ? color.main : C.border}`,
+        borderLeft: `4px solid ${color.main}`,
+        borderRadius: '2px 12px 12px 2px',
+        padding: '10px 12px',
+        boxShadow: shadow,
+      };
+  }
+}
+
 interface Position { x: number; y: number }
 interface Positions { [key: string]: Position }
 
@@ -216,8 +293,16 @@ function ComponentNode({
   const color = COLORS[component.color || 'indigo'];
   const [hovered, setHovered] = useState(false);
   const active = selected || hovered;
+  const tierShape = getTierShape(component.tier);
   const hasInteracted = useRef(false);
   if (isDragging) hasInteracted.current = true;
+
+  const TIER_ICONS: Record<string, React.ReactNode> = {
+    client: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3" width="10" height="7" rx="1.5" stroke={color.main} strokeWidth="1.2" /><path d="M5 12h4" stroke={color.main} strokeWidth="1.2" strokeLinecap="round" /></svg>,
+    service: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12 5v4L7 12 2 9V5z" stroke={color.main} strokeWidth="1.2" strokeLinejoin="round" /></svg>,
+    engine: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3.5" stroke={color.main} strokeWidth="1.2" /><path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke={color.main} strokeWidth="1.2" strokeLinecap="round" /></svg>,
+    data: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="4" rx="5" ry="2" stroke={color.main} strokeWidth="1.2" /><path d="M2 4v6c0 1.1 2.24 2 5 2s5-.9 5-2V4" stroke={color.main} strokeWidth="1.2" /></svg>,
+  };
 
   return (
     <div
@@ -236,41 +321,22 @@ function ComponentNode({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{
-        width: '100%',
-        background: active ? color.light : 'oklch(1 0 0)',
-        border: `1.5px solid ${active ? color.main : C.border}`,
-        borderRadius: '12px',
-        padding: '10px 12px',
-        boxShadow: isDragging
-          ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
-          : active
-          ? `0 0 0 3px ${color.dim}, 0 6px 24px oklch(0 0 0 / 0.08)`
-          : '0 1px 4px oklch(0 0 0 / 0.05), 0 3px 12px oklch(0 0 0 / 0.04)',
-        transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
-        transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-1px)' : 'translateY(0)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '5px',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '2.5px',
-          background: color.main, borderRadius: '12px 12px 0 0', opacity: active ? 1 : 0.4,
-        }} />
-
+      <div style={tierShapeStyles(tierShape, color, active, isDragging)}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {TIER_ICONS[component.tier]}
+            <span style={{
+              fontFamily: "'JetBrains Mono', monospace", fontSize: '8px', fontWeight: 500,
+              color: color.main, background: color.dim, border: `1px solid ${color.border}`,
+              borderRadius: tierShape === 'rounded' ? '10px' : tierShape === 'angular' ? '2px' : '4px',
+              padding: '1px 5px',
+            }}>
+              {TIER_LABELS[component.tier] || component.tier}
+            </span>
+          </div>
           <span style={{
-            fontFamily: "'JetBrains Mono', monospace", fontSize: '8px', fontWeight: 500,
-            color: color.main, background: color.dim, border: `1px solid ${color.border}`,
-            borderRadius: '4px', padding: '1px 5px',
-          }}>
-            {TIER_LABELS[component.tier] || component.tier}
-          </span>
-          <span style={{
-            fontFamily: "'JetBrains Mono', monospace", fontSize: '8px',
-            color: C.textDim,
+            fontFamily: "'JetBrains Mono', monospace", fontSize: '7px',
+            color: C.textDim, maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {component.technology}
           </span>
@@ -288,7 +354,8 @@ function ComponentNode({
             {component.subcomponents.slice(0, 2).map((sub) => (
               <span key={sub.name} style={{
                 fontFamily: "'JetBrains Mono', monospace", fontSize: '7.5px',
-                padding: '1px 5px', borderRadius: '8px',
+                padding: '1px 5px',
+                borderRadius: tierShape === 'rounded' ? '10px' : '8px',
                 background: color.light, color: color.main, border: `1px solid ${color.border}`,
               }}>
                 {sub.name}
@@ -297,7 +364,8 @@ function ComponentNode({
             {component.subcomponents.length > 2 && (
               <span style={{
                 fontFamily: "'JetBrains Mono', monospace", fontSize: '7.5px',
-                padding: '1px 5px', borderRadius: '8px',
+                padding: '1px 5px',
+                borderRadius: tierShape === 'rounded' ? '10px' : '8px',
                 background: color.light, color: color.main, border: `1px solid ${color.border}`,
               }}>
                 +{component.subcomponents.length - 2}
