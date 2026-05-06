@@ -170,30 +170,6 @@ function ConnectionLayer({ positions, connections, components }: { positions: Po
   );
 }
 
-function ArchDragHandle({ color, onDragStart }: { color: string; onDragStart: (e: React.MouseEvent) => void }) {
-  return (
-    <div
-      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); onDragStart(e); }}
-      style={{
-        position: 'absolute', top: 6, right: 6, width: 32, height: 32,
-        borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'grab', zIndex: 10, opacity: 0.35, transition: 'opacity 0.15s, background 0.15s',
-        background: 'transparent',
-      }}
-      onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.opacity = '0.9'; el.style.background = 'oklch(0 0 0 / 0.04)'; }}
-      onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.opacity = '0.35'; el.style.background = 'transparent'; }}
-    >
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="4.5" cy="3" r="1.3" fill={color} />
-        <circle cx="9.5" cy="3" r="1.3" fill={color} />
-        <circle cx="4.5" cy="7" r="1.3" fill={color} />
-        <circle cx="9.5" cy="7" r="1.3" fill={color} />
-        <circle cx="4.5" cy="11" r="1.3" fill={color} />
-        <circle cx="9.5" cy="11" r="1.3" fill={color} />
-      </svg>
-    </div>
-  );
-}
 
 function ComponentNode({
   component,
@@ -215,6 +191,8 @@ function ComponentNode({
   const color = COLORS[component.color || 'indigo'];
   const [hovered, setHovered] = useState(false);
   const active = selected || hovered;
+  const hasInteracted = useRef(false);
+  if (isDragging) hasInteracted.current = true;
 
   return (
     <div
@@ -224,9 +202,11 @@ function ComponentNode({
         left: pos.x,
         top: pos.y,
         width: NODE_W,
-        cursor: 'pointer',
-        animation: isDragging ? 'none' : `archNodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        animation: hasInteracted.current ? 'none' : `archNodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
+        userSelect: 'none',
       }}
+      onMouseDown={(e) => { e.preventDefault(); onDrag(component.id, e); }}
       onClick={() => onClick(component.id)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -250,7 +230,6 @@ function ComponentNode({
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <ArchDragHandle color={color.main} onDragStart={(e) => onDrag(component.id, e)} />
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
           background: color.main, borderRadius: '14px 14px 0 0', opacity: active ? 1 : 0.4,

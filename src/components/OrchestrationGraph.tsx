@@ -233,30 +233,6 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
   );
 }
 
-function DragHandle({ color, onDragStart }: { color: string; onDragStart: (e: React.MouseEvent) => void }) {
-  return (
-    <div
-      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); onDragStart(e); }}
-      style={{
-        position: 'absolute', top: 6, right: 6, width: 32, height: 32,
-        borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'grab', zIndex: 10, opacity: 0.35, transition: 'opacity 0.15s, background 0.15s',
-        background: 'transparent',
-      }}
-      onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.opacity = '0.9'; el.style.background = 'oklch(0 0 0 / 0.04)'; }}
-      onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.opacity = '0.35'; el.style.background = 'transparent'; }}
-    >
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="4.5" cy="3" r="1.3" fill={color} />
-        <circle cx="9.5" cy="3" r="1.3" fill={color} />
-        <circle cx="4.5" cy="7" r="1.3" fill={color} />
-        <circle cx="9.5" cy="7" r="1.3" fill={color} />
-        <circle cx="4.5" cy="11" r="1.3" fill={color} />
-        <circle cx="9.5" cy="11" r="1.3" fill={color} />
-      </svg>
-    </div>
-  );
-}
 
 function NodeCard({
   agent,
@@ -280,6 +256,9 @@ function NodeCard({
   const active = selected || hovered;
   const icon = ICONS[agent.id] || ICONS.default;
 
+  const hasInteracted = useRef(false);
+  if (isDragging) hasInteracted.current = true;
+
   return (
     <div
       data-node-id={agent.id}
@@ -289,9 +268,11 @@ function NodeCard({
         top: pos.y,
         width: NODE_W,
         height: NODE_H,
-        cursor: 'pointer',
-        animation: isDragging ? 'none' : `nodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        animation: hasInteracted.current ? 'none' : `nodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
+        userSelect: 'none',
       }}
+      onMouseDown={(e) => { e.preventDefault(); onDrag(agent.id, e); }}
       onClick={() => onClick(agent.id)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -318,7 +299,6 @@ function NodeCard({
           overflow: 'hidden',
         }}
       >
-        <DragHandle color={color.main} onDragStart={(e) => onDrag(agent.id, e)} />
         <div
           style={{
             position: 'absolute',
