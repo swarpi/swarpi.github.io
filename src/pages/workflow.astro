@@ -1,6 +1,7 @@
 ---
 import ProjectGrid from '@/components/ProjectGrid';
 import ThemeToggle from '@/components/ThemeToggle.astro';
+import '@/styles/global.css';
 import { fetchProjectsWithOrchestrations } from '@/lib/orchestration';
 
 const projects = await fetchProjectsWithOrchestrations();
@@ -22,7 +23,7 @@ const projects = await fetchProjectsWithOrchestrations();
     </script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { width: 100%; min-height: 100vh; background: oklch(0.97 0.008 80); }
+      html, body { width: 100%; min-height: 100vh; background: var(--wf-bg); }
     </style>
   </head>
   <body>

@@ -29,11 +29,13 @@ const COLORS: Record<string, { main: string; light: string; dim: string; border:
 };
 
 const C = {
-  border: 'oklch(0.88 0.01 80)',
-  textPrimary: 'oklch(0.18 0.02 265)',
-  textSec: 'oklch(0.45 0.02 265)',
-  textDim: 'oklch(0.65 0.015 265)',
-  bg: 'oklch(0.97 0.008 80)',
+  border: 'var(--wf-border)',
+  textPrimary: 'var(--wf-text)',
+  textSec: 'var(--wf-text-sec)',
+  textDim: 'var(--wf-text-dim)',
+  bg: 'var(--wf-bg)',
+  card: 'var(--wf-card)',
+  labelBg: 'var(--wf-label-bg)',
 };
 
 const TIER_ORDER: Record<string, number> = { client: 0, service: 1, engine: 2, data: 3 };
@@ -232,7 +234,7 @@ function ConnectionLayer({ positions, connections, components }: { positions: Po
               lineHeight: 1,
               padding: '2px 5px',
               borderRadius: '8px',
-              background: 'oklch(1 0 0 / 0.9)',
+              background: C.labelBg,
               border: `1px solid oklch(0.88 0.04 265)`,
               color: l.color,
               whiteSpace: 'nowrap',
@@ -293,7 +295,7 @@ function ComponentNode({
     >
       <div style={{
         width: '100%',
-        background: active ? color.light : 'oklch(1 0 0)',
+        background: active ? color.light : C.card,
         border: `1.5px solid ${active ? color.main : C.border}`,
         borderRadius: '12px',
         padding: component.tier === 'service' ? '10px 12px 10px 15px' : '10px 12px',
@@ -370,7 +372,7 @@ function DetailPanel({ component, onClose }: { component: ArchComponent; onClose
   return (
     <div style={{
       position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-      width: 360, background: 'oklch(1 0 0)', border: `1.5px solid ${color.main}`,
+      width: 360, background: C.card, border: `1.5px solid ${color.main}`,
       borderRadius: '18px', padding: '24px',
       boxShadow: `0 0 0 4px ${color.dim}, 0 20px 60px oklch(0 0 0 / 0.15)`,
       animation: 'archPanelIn 0.25s cubic-bezier(0.16,1,0.3,1) both', zIndex: 300,

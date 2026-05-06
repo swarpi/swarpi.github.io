@@ -4,11 +4,13 @@ import OrchestrationGraph from './OrchestrationGraph';
 import ArchitectureGraph from './ArchitectureGraph';
 
 const C = {
-  border: 'oklch(0.88 0.01 80)',
-  textPrimary: 'oklch(0.18 0.02 265)',
-  textSec: 'oklch(0.45 0.02 265)',
-  textDim: 'oklch(0.65 0.015 265)',
-  bg: 'oklch(0.97 0.008 80)',
+  border: 'var(--wf-border)',
+  textPrimary: 'var(--wf-text)',
+  textSec: 'var(--wf-text-sec)',
+  textDim: 'var(--wf-text-dim)',
+  bg: 'var(--wf-bg)',
+  card: 'var(--wf-card)',
+  cardHover: 'var(--wf-card-hover)',
   indigo: 'oklch(0.45 0.18 265)',
   indigoLight: 'oklch(0.93 0.04 265)',
   indigoDim: 'oklch(0.45 0.18 265 / 0.12)',
@@ -33,7 +35,7 @@ function ProjectCard({
   return (
     <div
       style={{
-        background: hovered ? 'oklch(1 0 0)' : 'oklch(0.995 0.005 80)',
+        background: hovered ? C.cardHover : C.card,
         border: `1.5px solid ${hovered ? C.indigo : C.border}`,
         borderRadius: '16px',
         padding: '24px',
@@ -336,7 +338,7 @@ export default function ProjectGrid({ projects }: ProjectGridProps) {
           animation: 'fadeUp 0.5s 0.4s both',
         }}
       >
-        Add <code style={{ background: 'oklch(1 0 0)', padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}` }}>orchestration.yaml</code> to your repo to define agent workflows
+        Add <code style={{ background: C.card, padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}` }}>orchestration.yaml</code> to your repo to define agent workflows
       </div>
     </div>
   );
