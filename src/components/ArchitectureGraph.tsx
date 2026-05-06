@@ -118,7 +118,7 @@ function ConnectionLayer({ positions, connections, components }: { positions: Po
   }).filter(Boolean);
 
   return (
-    <svg style={{ position: 'absolute', left: -2000, top: -2000, width: 4000, height: 4000, pointerEvents: 'none', overflow: 'visible' }}>
+    <svg style={{ position: 'absolute', left: 0, top: 0, width: 1, height: 1, pointerEvents: 'none', overflow: 'visible' }}>
       <defs>
         {Object.entries(COLORS).map(([name, color]) => (
           <marker key={name} id={`arch-arr-${name}`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
