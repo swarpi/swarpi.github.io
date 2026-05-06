@@ -208,20 +208,22 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
             className={l.isFeedback ? 'flow-line-reverse' : 'flow-line'}
             style={{ animationDelay: `${i * 0.2}s` }}
           />
-          <foreignObject x={l.mid.x - 50} y={l.mid.y - 12} width="100" height="24">
+          <foreignObject x={l.mid.x - 40} y={l.mid.y - 9} width="80" height="18">
             <div
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '9px',
+                fontSize: '7px',
                 lineHeight: 1,
-                padding: '4px 8px',
-                borderRadius: '12px',
+                padding: '3px 6px',
+                borderRadius: '9px',
                 background: 'oklch(1 0 0)',
                 border: `1px solid oklch(0.88 0.04 265)`,
                 color: l.color,
                 whiteSpace: 'nowrap',
                 textAlign: 'center',
-                boxShadow: '0 1px 4px oklch(0 0 0 / 0.06)',
+                boxShadow: '0 1px 3px oklch(0 0 0 / 0.06)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
               {l.artifact}

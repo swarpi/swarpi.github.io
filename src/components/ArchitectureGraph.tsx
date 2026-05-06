@@ -146,22 +146,23 @@ function ConnectionLayer({ positions, connections, components }: { positions: Po
             className="arch-flow-line"
             style={{ animationDelay: `${i * 0.2}s` }}
           />
-          <foreignObject x={l.mid.x - 60} y={l.mid.y - 14} width="120" height="28">
+          <foreignObject x={l.mid.x - 45} y={l.mid.y - 9} width="90" height="18">
             <div style={{
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '8.5px',
+              fontSize: '7px',
               lineHeight: 1,
-              padding: '4px 8px',
-              borderRadius: '12px',
+              padding: '3px 6px',
+              borderRadius: '9px',
               background: 'oklch(1 0 0)',
               border: `1px solid oklch(0.88 0.04 265)`,
               color: l.color,
               whiteSpace: 'nowrap',
               textAlign: 'center',
-              boxShadow: '0 1px 4px oklch(0 0 0 / 0.06)',
+              boxShadow: '0 1px 3px oklch(0 0 0 / 0.06)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }}>
-              {l.label}
-              <span style={{ opacity: 0.5, marginLeft: '4px' }}>({l.protocol})</span>
+              {l.label} <span style={{ opacity: 0.5 }}>({l.protocol})</span>
             </div>
           </foreignObject>
         </g>
