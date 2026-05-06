@@ -177,7 +177,7 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
   }).filter(Boolean);
 
   return (
-    <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible' }}>
+    <svg style={{ position: 'absolute', left: -2000, top: -2000, width: 4000, height: 4000, pointerEvents: 'none', overflow: 'visible' }}>
       <defs>
         {Object.entries(COLORS).map(([name, color]) => (
           <marker key={name} id={`arr-${name}`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
@@ -523,13 +523,26 @@ export default function OrchestrationGraph({ orchestration, projectName, project
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const dragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const didDragRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const INITIAL_SCALE = 1.4;
+  const scaleRef = useRef(INITIAL_SCALE);
+  const panRef = useRef({ x: 0, y: 0 });
+  const [, forceRender] = useState(0);
+  const rerender = useCallback(() => forceRender((n) => n + 1), []);
+
+  const panDragRef = useRef<{ startX: number; startY: number } | null>(null);
+
+  const toCanvas = useCallback((screenX: number, screenY: number) => ({
+    x: (screenX - panRef.current.x) / scaleRef.current,
+    y: (screenY - panRef.current.y) / scaleRef.current,
+  }), []);
 
   const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
-    const nodeEl = (e.target as HTMLElement).closest('[data-node-id]');
-    const rect = nodeEl?.getBoundingClientRect();
-    if (!rect) return;
-
-    dragRef.current = { id, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+    const pos = positions[id];
+    if (!pos) return;
+    const canvas = toCanvas(e.clientX, e.clientY);
+    dragRef.current = { id, offsetX: canvas.x - pos.x, offsetY: canvas.y - pos.y };
     didDragRef.current = false;
     setDraggingId(id);
 
@@ -537,9 +550,8 @@ export default function OrchestrationGraph({ orchestration, projectName, project
       const drag = dragRef.current;
       if (!drag) return;
       didDragRef.current = true;
-      const x = ev.clientX - drag.offsetX;
-      const y = ev.clientY - drag.offsetY;
-      setPositions((prev) => ({ ...prev, [drag.id]: { x, y } }));
+      const c = toCanvas(ev.clientX, ev.clientY);
+      setPositions((prev) => ({ ...prev, [drag.id]: { x: c.x - drag.offsetX, y: c.y - drag.offsetY } }));
     };
 
     const onUp = () => {
@@ -551,7 +563,49 @@ export default function OrchestrationGraph({ orchestration, projectName, project
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
-  }, []);
+  }, [positions, toCanvas]);
+
+  const handleCanvasPanStart = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('[data-node-id]')) return;
+    e.preventDefault();
+    panDragRef.current = { startX: e.clientX - panRef.current.x, startY: e.clientY - panRef.current.y };
+    didDragRef.current = false;
+
+    const onMove = (ev: MouseEvent) => {
+      if (!panDragRef.current) return;
+      didDragRef.current = true;
+      panRef.current = { x: ev.clientX - panDragRef.current.startX, y: ev.clientY - panDragRef.current.startY };
+      rerender();
+    };
+
+    const onUp = () => {
+      panDragRef.current = null;
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [rerender]);
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    e.preventDefault();
+    const delta = -e.deltaY * 0.001;
+    const oldScale = scaleRef.current;
+    const newScale = Math.min(3, Math.max(0.3, oldScale + delta * oldScale));
+    const cx = (e.clientX - panRef.current.x) / oldScale;
+    const cy = (e.clientY - panRef.current.y) / oldScale;
+    panRef.current = { x: e.clientX - cx * newScale, y: e.clientY - cy * newScale };
+    scaleRef.current = newScale;
+    rerender();
+  }, [rerender]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [handleWheel]);
 
   const compute = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -559,35 +613,34 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     const H = window.innerHeight;
     setDims({ W, H });
 
+    panRef.current = { x: W / 2, y: H / 2 };
+    scaleRef.current = INITIAL_SCALE;
+
     const agents = orchestration.agents;
     const n = agents.length;
-    const cx = W / 2;
-    const cy = H / 2;
 
     const newPositions: Positions = {};
 
     if (orchestration.layout === 'diamond' && n === 4) {
-      const hSpread = Math.min(W * 0.22, 260);
-      const vSpread = Math.min(H * 0.26, 200);
-      newPositions[agents[0].id] = { x: cx - NODE_W / 2, y: cy - vSpread - NODE_H / 2 };
-      newPositions[agents[1].id] = { x: cx - hSpread - NODE_W / 2, y: cy - NODE_H / 2 };
-      newPositions[agents[2].id] = { x: cx + hSpread - NODE_W / 2, y: cy - NODE_H / 2 };
-      newPositions[agents[3].id] = { x: cx - NODE_W / 2, y: cy + vSpread - NODE_H / 2 };
+      const hSpread = 180;
+      const vSpread = 140;
+      newPositions[agents[0].id] = { x: -NODE_W / 2, y: -vSpread - NODE_H / 2 };
+      newPositions[agents[1].id] = { x: -hSpread - NODE_W / 2, y: -NODE_H / 2 };
+      newPositions[agents[2].id] = { x: hSpread - NODE_W / 2, y: -NODE_H / 2 };
+      newPositions[agents[3].id] = { x: -NODE_W / 2, y: vSpread - NODE_H / 2 };
     } else if (n <= 3) {
-      // Horizontal layout for small number of agents
-      const spacing = Math.min(W * 0.25, 300);
-      const startX = cx - ((n - 1) * spacing) / 2 - NODE_W / 2;
+      const spacing = 220;
+      const startX = -((n - 1) * spacing) / 2 - NODE_W / 2;
       agents.forEach((agent, i) => {
-        newPositions[agent.id] = { x: startX + i * spacing, y: cy - NODE_H / 2 };
+        newPositions[agent.id] = { x: startX + i * spacing, y: -NODE_H / 2 };
       });
     } else {
-      // Grid layout for larger numbers
       const cols = Math.ceil(Math.sqrt(n));
       const rows = Math.ceil(n / cols);
-      const spacingX = Math.min(W * 0.22, 280);
-      const spacingY = Math.min(H * 0.28, 220);
-      const startX = cx - ((cols - 1) * spacingX) / 2 - NODE_W / 2;
-      const startY = cy - ((rows - 1) * spacingY) / 2 - NODE_H / 2;
+      const spacingX = 200;
+      const spacingY = 140;
+      const startX = -((cols - 1) * spacingX) / 2 - NODE_W / 2;
+      const startY = -((rows - 1) * spacingY) / 2 - NODE_H / 2;
 
       agents.forEach((agent, i) => {
         const col = i % cols;
@@ -597,7 +650,8 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     }
 
     setPositions(newPositions);
-  }, [orchestration]);
+    rerender();
+  }, [orchestration, rerender]);
 
   useEffect(() => {
     compute();
@@ -621,15 +675,21 @@ export default function OrchestrationGraph({ orchestration, projectName, project
 
   const selectedAgent = orchestration.agents.find((a) => a.id === selected);
 
+  const scale = scaleRef.current;
+  const pan = panRef.current;
+
   return (
     <div
+      ref={containerRef}
       style={{
         width: '100%',
         height: '100%',
         position: 'relative',
         overflow: 'hidden',
         background: C.bg,
+        cursor: draggingId ? 'grabbing' : 'default',
       }}
+      onMouseDown={handleCanvasPanStart}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
@@ -669,8 +729,36 @@ export default function OrchestrationGraph({ orchestration, projectName, project
         }}
       />
 
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        transformOrigin: '0 0',
+        transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+        willChange: 'transform',
+      }}>
+        {Object.keys(positions).length > 0 && (
+          <ConnectionLayer positions={positions} connections={orchestration.connections} agents={orchestration.agents} />
+        )}
+
+        {orchestration.agents.map((agent, i) =>
+          positions[agent.id] ? (
+            <NodeCard
+              key={agent.id}
+              agent={agent}
+              index={i}
+              pos={positions[agent.id]}
+              selected={selected === agent.id}
+              onClick={(id) => { if (!didDragRef.current) setSelected((prev) => (prev === id ? null : id)); }}
+              onDrag={handleDragStart}
+              isDragging={draggingId === agent.id}
+            />
+          ) : null
+        )}
+      </div>
+
       {/* Header */}
-      <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 10, animation: 'fadeUp 0.5s both' }}>
+      <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 10, animation: 'fadeUp 0.5s both', pointerEvents: 'auto' }}>
         {onClose && (
           <button
             onClick={onClose}
@@ -716,25 +804,6 @@ export default function OrchestrationGraph({ orchestration, projectName, project
         </div>
       </div>
 
-      {Object.keys(positions).length > 0 && (
-        <ConnectionLayer positions={positions} connections={orchestration.connections} agents={orchestration.agents} />
-      )}
-
-      {orchestration.agents.map((agent, i) =>
-        positions[agent.id] ? (
-          <NodeCard
-            key={agent.id}
-            agent={agent}
-            index={i}
-            pos={positions[agent.id]}
-            selected={selected === agent.id}
-            onClick={(id) => { if (!didDragRef.current) setSelected((prev) => (prev === id ? null : id)); }}
-            onDrag={handleDragStart}
-            isDragging={draggingId === agent.id}
-          />
-        ) : null
-      )}
-
       {selected && selectedAgent && (
         <>
           <div
@@ -764,12 +833,15 @@ export default function OrchestrationGraph({ orchestration, projectName, project
           fontSize: '10px',
           color: C.textDim,
           animation: 'fadeUp 0.5s 0.8s both',
+          pointerEvents: 'none',
         }}
       >
-        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>click</span>
-        agent to inspect ·
+        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>scroll</span>
+        to zoom ·
         <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>drag</span>
-        to rearrange ·
+        to pan or rearrange ·
+        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>click</span>
+        to inspect ·
         <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>esc</span>
         to go back
       </div>

@@ -118,7 +118,7 @@ function ConnectionLayer({ positions, connections, components }: { positions: Po
   }).filter(Boolean);
 
   return (
-    <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible' }}>
+    <svg style={{ position: 'absolute', left: -2000, top: -2000, width: 4000, height: 4000, pointerEvents: 'none', overflow: 'visible' }}>
       <defs>
         {Object.entries(COLORS).map(([name, color]) => (
           <marker key={name} id={`arch-arr-${name}`} markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
@@ -380,12 +380,26 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const dragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const didDragRef = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const INITIAL_SCALE = 1.4;
+  const scaleRef = useRef(INITIAL_SCALE);
+  const panRef = useRef({ x: 0, y: 0 });
+  const [, forceRender] = useState(0);
+  const rerender = useCallback(() => forceRender((n) => n + 1), []);
+
+  const panDragRef = useRef<{ startX: number; startY: number } | null>(null);
+
+  const toCanvas = useCallback((screenX: number, screenY: number) => ({
+    x: (screenX - panRef.current.x) / scaleRef.current,
+    y: (screenY - panRef.current.y) / scaleRef.current,
+  }), []);
 
   const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
-    const el = (e.target as HTMLElement).closest(`[data-node-id="${id}"]`) as HTMLElement | null;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    dragRef.current = { id, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+    const pos = positions[id];
+    if (!pos) return;
+    const canvas = toCanvas(e.clientX, e.clientY);
+    dragRef.current = { id, offsetX: canvas.x - pos.x, offsetY: canvas.y - pos.y };
     didDragRef.current = false;
     setDraggingId(id);
 
@@ -393,9 +407,8 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
       const drag = dragRef.current;
       if (!drag) return;
       didDragRef.current = true;
-      const x = ev.clientX - drag.offsetX;
-      const y = ev.clientY - drag.offsetY;
-      setPositions((prev) => ({ ...prev, [drag.id]: { x, y } }));
+      const c = toCanvas(ev.clientX, ev.clientY);
+      setPositions((prev) => ({ ...prev, [drag.id]: { x: c.x - drag.offsetX, y: c.y - drag.offsetY } }));
     };
 
     const onUp = () => {
@@ -407,13 +420,58 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
-  }, []);
+  }, [positions, toCanvas]);
+
+  const handleCanvasPanStart = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('[data-node-id]')) return;
+    e.preventDefault();
+    panDragRef.current = { startX: e.clientX - panRef.current.x, startY: e.clientY - panRef.current.y };
+    didDragRef.current = false;
+
+    const onMove = (ev: MouseEvent) => {
+      if (!panDragRef.current) return;
+      didDragRef.current = true;
+      panRef.current = { x: ev.clientX - panDragRef.current.startX, y: ev.clientY - panDragRef.current.startY };
+      rerender();
+    };
+
+    const onUp = () => {
+      panDragRef.current = null;
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  }, [rerender]);
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    e.preventDefault();
+    const delta = -e.deltaY * 0.001;
+    const oldScale = scaleRef.current;
+    const newScale = Math.min(3, Math.max(0.3, oldScale + delta * oldScale));
+    const cx = (e.clientX - panRef.current.x) / oldScale;
+    const cy = (e.clientY - panRef.current.y) / oldScale;
+    panRef.current = { x: e.clientX - cx * newScale, y: e.clientY - cy * newScale };
+    scaleRef.current = newScale;
+    rerender();
+  }, [rerender]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [handleWheel]);
 
   const compute = useCallback(() => {
     if (typeof window === 'undefined') return;
     const W = window.innerWidth;
     const H = window.innerHeight;
     setDims({ W, H });
+
+    panRef.current = { x: W / 2, y: H / 2 };
+    scaleRef.current = INITIAL_SCALE;
 
     const components = architecture.components;
     const tiers: Record<string, ArchComponent[]> = {};
@@ -428,15 +486,15 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
     );
 
     const totalTiers = sortedTiers.length;
-    const tierSpacing = Math.min(H * 0.18, 160);
-    const startY = (H - (totalTiers - 1) * tierSpacing) / 2 - NODE_H / 2 + 20;
+    const tierSpacing = 140;
+    const startY = -((totalTiers - 1) * tierSpacing) / 2 - NODE_H / 2;
 
     const newPositions: Positions = {};
 
     sortedTiers.forEach(([, comps], tierIdx) => {
       const y = startY + tierIdx * tierSpacing;
-      const spacing = Math.min(W * 0.18, 220);
-      const startX = (W - (comps.length - 1) * spacing) / 2 - NODE_W / 2;
+      const spacing = 200;
+      const startX = -((comps.length - 1) * spacing) / 2 - NODE_W / 2;
 
       comps.forEach((comp, i) => {
         newPositions[comp.id] = { x: startX + i * spacing, y };
@@ -444,7 +502,8 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
     });
 
     setPositions(newPositions);
-  }, [architecture]);
+    rerender();
+  }, [architecture, rerender]);
 
   useEffect(() => {
     compute();
@@ -464,9 +523,18 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
   }, [selected, onClose]);
 
   const selectedComp = architecture.components.find((c) => c.id === selected);
+  const scale = scaleRef.current;
+  const pan = panRef.current;
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: C.bg }}>
+    <div
+      ref={containerRef}
+      style={{
+        width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: C.bg,
+        cursor: draggingId ? 'grabbing' : 'default',
+      }}
+      onMouseDown={handleCanvasPanStart}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
         @keyframes archFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -483,7 +551,35 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
         background: 'radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, oklch(0.92 0.01 80 / 0.5) 100%)',
       }} />
 
-      <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 10, animation: 'archFadeUp 0.5s both' }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        transformOrigin: '0 0',
+        transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+        willChange: 'transform',
+      }}>
+        {Object.keys(positions).length > 0 && (
+          <ConnectionLayer positions={positions} connections={architecture.connections} components={architecture.components} />
+        )}
+
+        {architecture.components.map((comp, i) =>
+          positions[comp.id] ? (
+            <ComponentNode
+              key={comp.id}
+              component={comp}
+              index={i}
+              pos={positions[comp.id]}
+              selected={selected === comp.id}
+              onClick={(id) => { if (!didDragRef.current) setSelected((prev) => (prev === id ? null : id)); }}
+              onDrag={handleDragStart}
+              isDragging={draggingId === comp.id}
+            />
+          ) : null
+        )}
+      </div>
+
+      <div style={{ position: 'absolute', top: 28, left: 36, zIndex: 10, animation: 'archFadeUp 0.5s both', pointerEvents: 'auto' }}>
         {onClose && (
           <button onClick={onClose} style={{
             display: 'inline-flex', alignItems: 'center', gap: '6px',
@@ -508,25 +604,6 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
         </div>
       </div>
 
-      {Object.keys(positions).length > 0 && (
-        <ConnectionLayer positions={positions} connections={architecture.connections} components={architecture.components} />
-      )}
-
-      {architecture.components.map((comp, i) =>
-        positions[comp.id] ? (
-          <ComponentNode
-            key={comp.id}
-            component={comp}
-            index={i}
-            pos={positions[comp.id]}
-            selected={selected === comp.id}
-            onClick={(id) => { if (!didDragRef.current) setSelected((prev) => (prev === id ? null : id)); }}
-            onDrag={handleDragStart}
-            isDragging={draggingId === comp.id}
-          />
-        ) : null
-      )}
-
       {selected && selectedComp && (
         <>
           <div style={{ position: 'fixed', inset: 0, background: 'oklch(0 0 0 / 0.3)', zIndex: 250 }}
@@ -539,12 +616,14 @@ export default function ArchitectureGraph({ architecture, projectName, projectUr
         position: 'absolute', bottom: 24, left: '50%', transform: 'translateX(-50%)',
         display: 'flex', alignItems: 'center', gap: '8px',
         fontFamily: "'JetBrains Mono', monospace", fontSize: '10px', color: C.textDim,
-        animation: 'archFadeUp 0.5s 0.8s both',
+        animation: 'archFadeUp 0.5s 0.8s both', pointerEvents: 'none',
       }}>
-        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>click</span>
-        component to inspect ·
+        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>scroll</span>
+        to zoom ·
         <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>drag</span>
-        to rearrange ·
+        to pan or rearrange ·
+        <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>click</span>
+        to inspect ·
         <span style={{ padding: '2px 6px', borderRadius: '4px', border: `1px solid ${C.border}`, color: C.textSec }}>esc</span>
         to go back
       </div>
