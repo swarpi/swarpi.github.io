@@ -12,7 +12,7 @@
   </svg>
 </button>
 
-<style>
+<style is:global>
   .theme-toggle {
     display: flex;
     align-items: center;
@@ -32,12 +32,11 @@
     border-color: var(--color-text-muted);
   }
 
-  .icon { display: none; }
+  .theme-toggle .icon { display: none; }
 
-  :global(:root:not([data-theme])) .icon-system,
-  :global([data-theme="system"]) .icon-system { display: block; }
-  :global([data-theme="light"]) .icon-sun { display: block; }
-  :global([data-theme="dark"]) .icon-moon { display: block; }
+  :root:not([data-theme]) .theme-toggle .icon-system { display: block; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
 </style>
 
 <script>
