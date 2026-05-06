@@ -63,6 +63,12 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  'qa-tester': (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M4 5h12v10H4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M7 9l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
   default: (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" />
@@ -71,8 +77,30 @@ const ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const NODE_W = 160;
-const NODE_H = 90;
+type AgentKind = 'decision' | 'planning' | 'execution' | 'validation';
+
+function getAccentElements(kind: AgentKind | undefined, colorMain: string, active: boolean) {
+  const opacity = active ? 1 : 0.4;
+  const base = { position: 'absolute' as const, background: colorMain, opacity };
+
+  switch (kind) {
+    case 'decision':
+      return [{ ...base, top: 0, left: 0, bottom: 0, width: '3px', borderRadius: '12px 0 0 12px' }];
+    case 'execution':
+      return [{ ...base, bottom: 0, left: 0, right: 0, height: '2.5px', borderRadius: '0 0 12px 12px' }];
+    case 'validation':
+      return [
+        { ...base, top: 0, left: 0, right: 0, height: '1.5px', borderRadius: '12px 12px 0 0' },
+        { ...base, bottom: 0, left: 0, right: 0, height: '1.5px', borderRadius: '0 0 12px 12px' },
+      ];
+    case 'planning':
+    default:
+      return [{ ...base, top: 0, left: 0, right: 0, height: '2.5px', borderRadius: '12px 12px 0 0' }];
+  }
+}
+
+const NODE_W = 170;
+const NODE_H = 105;
 
 interface Position {
   x: number;
@@ -285,7 +313,7 @@ function NodeCard({
         left: pos.x,
         top: pos.y,
         width: NODE_W,
-        height: NODE_H,
+        minHeight: NODE_H,
         cursor: isDragging ? 'grabbing' : 'grab',
         animation: hasInteracted.current ? 'none' : `nodeIn 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms both`,
         userSelect: 'none',
@@ -298,11 +326,10 @@ function NodeCard({
       <div
         style={{
           width: '100%',
-          height: '100%',
           background: active ? color.light : 'oklch(1 0 0)',
           border: `1.5px solid ${active ? color.main : C.border}`,
           borderRadius: '12px',
-          padding: '10px 12px',
+          padding: agent.kind === 'decision' ? '10px 12px 10px 15px' : '10px 12px',
           boxShadow: isDragging
             ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
             : active
@@ -317,15 +344,9 @@ function NodeCard({
           overflow: 'hidden',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0, height: '2.5px',
-            background: color.main,
-            borderRadius: '12px 12px 0 0',
-            opacity: active ? 1 : 0.4,
-          }}
-        />
+        {getAccentElements(agent.kind, color.main, active).map((style, i) => (
+          <div key={i} style={style} />
+        ))}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span
             style={{
@@ -435,6 +456,22 @@ function DetailPanel({ agent, onClose, repoUrl }: { agent: Agent; onClose: () =>
         >
           Agent
         </span>
+        {agent.kind && (
+          <span
+            style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '9px',
+              color: C.textDim,
+              background: 'oklch(0.95 0.005 265)',
+              padding: '3px 8px',
+              borderRadius: '10px',
+              border: `1px solid ${C.border}`,
+              textTransform: 'capitalize',
+            }}
+          >
+            {agent.kind}
+          </span>
+        )}
       </div>
 
       <div
@@ -540,7 +577,7 @@ export default function OrchestrationGraph({ orchestration, projectName, project
   const didDragRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const INITIAL_SCALE = 1.4;
+  const INITIAL_SCALE = 1.1;
   const scaleRef = useRef(INITIAL_SCALE);
   const panRef = useRef({ x: 0, y: 0 });
   const [, forceRender] = useState(0);
@@ -637,14 +674,14 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     const newPositions: Positions = {};
 
     if (orchestration.layout === 'diamond' && n === 4) {
-      const hSpread = 180;
-      const vSpread = 140;
+      const hSpread = 240;
+      const vSpread = 180;
       newPositions[agents[0].id] = { x: -NODE_W / 2, y: -vSpread - NODE_H / 2 };
       newPositions[agents[1].id] = { x: -hSpread - NODE_W / 2, y: -NODE_H / 2 };
       newPositions[agents[2].id] = { x: hSpread - NODE_W / 2, y: -NODE_H / 2 };
       newPositions[agents[3].id] = { x: -NODE_W / 2, y: vSpread - NODE_H / 2 };
     } else if (n <= 3) {
-      const spacing = 220;
+      const spacing = 280;
       const startX = -((n - 1) * spacing) / 2 - NODE_W / 2;
       agents.forEach((agent, i) => {
         newPositions[agent.id] = { x: startX + i * spacing, y: -NODE_H / 2 };
@@ -652,8 +689,8 @@ export default function OrchestrationGraph({ orchestration, projectName, project
     } else {
       const cols = Math.ceil(Math.sqrt(n));
       const rows = Math.ceil(n / cols);
-      const spacingX = 200;
-      const spacingY = 140;
+      const spacingX = 280;
+      const spacingY = 200;
       const startX = -((cols - 1) * spacingX) / 2 - NODE_W / 2;
       const startY = -((rows - 1) * spacingY) / 2 - NODE_H / 2;
 

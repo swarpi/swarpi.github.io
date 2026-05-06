@@ -39,6 +39,43 @@ const C = {
 const TIER_ORDER: Record<string, number> = { client: 0, service: 1, engine: 2, data: 3 };
 const TIER_LABELS: Record<string, string> = { client: 'Client', service: 'Service', engine: 'Engine', data: 'Data' };
 
+type Tier = 'client' | 'service' | 'engine' | 'data';
+
+function getTierAccentElements(tier: Tier | string, colorMain: string, active: boolean) {
+  const opacity = active ? 1 : 0.4;
+  const base = { position: 'absolute' as const, background: colorMain, opacity };
+
+  switch (tier) {
+    case 'service':
+      return [{ ...base, top: 0, left: 0, bottom: 0, width: '3px', borderRadius: '12px 0 0 12px' }];
+    case 'engine':
+      return [{ ...base, bottom: 0, left: 0, right: 0, height: '2.5px', borderRadius: '0 0 12px 12px' }];
+    case 'data':
+      return [
+        { ...base, top: 0, left: 0, right: 0, height: '1.5px', borderRadius: '12px 12px 0 0' },
+        { ...base, bottom: 0, left: 0, right: 0, height: '1.5px', borderRadius: '0 0 12px 12px' },
+      ];
+    case 'client':
+    default:
+      return [{ ...base, top: 0, left: 0, right: 0, height: '2.5px', borderRadius: '12px 12px 0 0' }];
+  }
+}
+
+function getTierBadgeStyle(tier: string, color: { main: string; light: string; dim: string; border: string }) {
+  switch (tier) {
+    case 'client':
+      return { background: color.dim, color: color.main, border: `1px solid ${color.border}` };
+    case 'service':
+      return { background: 'transparent', color: color.main, border: `1.5px solid ${color.main}` };
+    case 'engine':
+      return { background: color.light, color: color.main, border: `1px dashed ${color.border}` };
+    case 'data':
+      return { background: color.dim, color: color.main, border: `1.5px double ${color.main}` };
+    default:
+      return { background: color.dim, color: color.main, border: `1px solid ${color.border}` };
+  }
+}
+
 const NODE_W = 170;
 const NODE_H = 100;
 
@@ -259,7 +296,7 @@ function ComponentNode({
         background: active ? color.light : 'oklch(1 0 0)',
         border: `1.5px solid ${active ? color.main : C.border}`,
         borderRadius: '12px',
-        padding: '10px 12px',
+        padding: component.tier === 'service' ? '10px 12px 10px 15px' : '10px 12px',
         boxShadow: isDragging
           ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
           : active
@@ -273,16 +310,15 @@ function ComponentNode({
         position: 'relative',
         overflow: 'hidden',
       }}>
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: '2.5px',
-          background: color.main, borderRadius: '12px 12px 0 0', opacity: active ? 1 : 0.4,
-        }} />
+        {getTierAccentElements(component.tier, color.main, active).map((style, i) => (
+          <div key={i} style={style} />
+        ))}
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{
             fontFamily: "'JetBrains Mono', monospace", fontSize: '8px', fontWeight: 500,
-            color: color.main, background: color.dim, border: `1px solid ${color.border}`,
             borderRadius: '4px', padding: '1px 5px',
+            ...getTierBadgeStyle(component.tier, color),
           }}>
             {TIER_LABELS[component.tier] || component.tier}
           </span>
