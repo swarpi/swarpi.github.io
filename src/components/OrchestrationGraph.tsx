@@ -784,7 +784,7 @@ export default function OrchestrationGraph({ orchestration, projectName, project
           position: 'absolute',
           inset: 0,
           pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, oklch(0.92 0.01 80 / 0.5) 100%)',
+          background: 'radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, var(--wf-bg) 100%)',
         }}
       />
 
