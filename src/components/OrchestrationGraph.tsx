@@ -74,75 +74,6 @@ const ICONS: Record<string, React.ReactNode> = {
 const NODE_W = 160;
 const NODE_H = 90;
 
-type NodeShape = 'card' | 'hexagonal' | 'pill' | 'left-accent';
-
-function getAgentShape(id: string): NodeShape {
-  if (id === 'executor') return 'hexagonal';
-  if (id === 'reviewer') return 'pill';
-  if (id === 'planner') return 'left-accent';
-  return 'card';
-}
-
-function shapeStyles(shape: NodeShape, color: typeof COLORS[keyof typeof COLORS], active: boolean, isDragging: boolean) {
-  const base = {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '6px',
-    position: 'relative' as const,
-    overflow: 'hidden' as const,
-    transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
-    transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-1px)' : 'translateY(0)',
-  };
-
-  const shadow = isDragging
-    ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
-    : active
-    ? `0 0 0 3px ${color.dim}, 0 6px 24px oklch(0 0 0 / 0.08)`
-    : '0 1px 4px oklch(0 0 0 / 0.05), 0 3px 12px oklch(0 0 0 / 0.04)';
-
-  switch (shape) {
-    case 'hexagonal':
-      return {
-        ...base,
-        background: active ? color.light : 'oklch(1 0 0)',
-        border: `1.5px dashed ${active ? color.main : C.border}`,
-        borderRadius: '4px 14px 4px 14px',
-        padding: '10px 12px',
-        boxShadow: shadow,
-      };
-    case 'pill':
-      return {
-        ...base,
-        background: active ? color.light : 'oklch(1 0 0)',
-        border: `1.5px solid ${active ? color.main : C.border}`,
-        borderRadius: '24px',
-        padding: '10px 16px',
-        boxShadow: shadow,
-      };
-    case 'left-accent':
-      return {
-        ...base,
-        background: active ? color.light : 'oklch(1 0 0)',
-        border: `1.5px solid ${active ? color.main : C.border}`,
-        borderLeft: `4px solid ${color.main}`,
-        borderRadius: '2px 12px 12px 2px',
-        padding: '10px 12px',
-        boxShadow: shadow,
-      };
-    default:
-      return {
-        ...base,
-        background: active ? color.light : 'oklch(1 0 0)',
-        border: `1.5px solid ${active ? color.main : C.border}`,
-        borderRadius: '12px',
-        padding: '10px 12px',
-        boxShadow: shadow,
-      };
-  }
-}
-
 interface Position {
   x: number;
   y: number;
@@ -236,6 +167,13 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
 
   const CURVATURE = 0.25;
 
+  const pairIndex = new Map<string, number>();
+  connections.forEach((conn) => {
+    const key = [conn.from, conn.to].sort().join('::');
+    pairIndex.set(key, (pairIndex.get(key) ?? 0) + 1);
+  });
+  const pairCounter = new Map<string, number>();
+
   const lines = connections.map((conn) => {
     const fromPos = positions[conn.from];
     const toPos = positions[conn.to];
@@ -243,6 +181,10 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
 
     const color = getColor(conn.from);
     const isFeedback = conn.type === 'feedback';
+    const key = [conn.from, conn.to].sort().join('::');
+    const isBidirectional = (pairIndex.get(key) ?? 0) > 1;
+    const myIndex = pairCounter.get(key) ?? 0;
+    pairCounter.set(key, myIndex + 1);
 
     const { source, sourceDir, target, targetDir } = getSmartPort(fromPos, toPos, NODE_W, NODE_H);
 
@@ -250,7 +192,11 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
     const c2 = getControlPoint(targetDir, target.x, target.y, source.x, source.y, CURVATURE);
 
     const d = `M${source.x},${source.y} C${c1.x},${c1.y} ${c2.x},${c2.y} ${target.x},${target.y}`;
-    const mid = bezMid(source.x, source.y, c1.x, c1.y, c2.x, c2.y, target.x, target.y);
+    const t = isBidirectional ? (myIndex === 0 ? 0.35 : 0.65) : 0.5;
+    const mid = {
+      x: (1-t)**3*source.x + 3*(1-t)**2*t*c1.x + 3*(1-t)*t**2*c2.x + t**3*target.x,
+      y: (1-t)**3*source.y + 3*(1-t)**2*t*c1.y + 3*(1-t)*t**2*c2.y + t**3*target.y,
+    };
 
     return { d, mid, artifact: conn.artifact, color: color.main, isFeedback };
   }).filter(Boolean);
@@ -327,7 +273,6 @@ function NodeCard({
   const [hovered, setHovered] = useState(false);
   const active = selected || hovered;
   const icon = ICONS[agent.id] || ICONS.default;
-  const shape = getAgentShape(agent.id);
 
   const hasInteracted = useRef(false);
   if (isDragging) hasInteracted.current = true;
@@ -350,18 +295,37 @@ function NodeCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={shapeStyles(shape, color, active, isDragging)}>
-        {shape === 'card' && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0, left: 0, right: 0, height: '2.5px',
-              background: color.main,
-              borderRadius: '12px 12px 0 0',
-              opacity: active ? 1 : 0.4,
-            }}
-          />
-        )}
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          background: active ? color.light : 'oklch(1 0 0)',
+          border: `1.5px solid ${active ? color.main : C.border}`,
+          borderRadius: '12px',
+          padding: '10px 12px',
+          boxShadow: isDragging
+            ? `0 0 0 3px ${color.dim}, 0 12px 36px oklch(0 0 0 / 0.15)`
+            : active
+            ? `0 0 0 3px ${color.dim}, 0 6px 24px oklch(0 0 0 / 0.08)`
+            : '0 1px 4px oklch(0 0 0 / 0.05), 0 3px 12px oklch(0 0 0 / 0.04)',
+          transition: isDragging ? 'box-shadow 0.15s' : 'all 0.2s cubic-bezier(0.16,1,0.3,1)',
+          transform: isDragging ? 'scale(1.03)' : active ? 'translateY(-1px)' : 'translateY(0)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, height: '2.5px',
+            background: color.main,
+            borderRadius: '12px 12px 0 0',
+            opacity: active ? 1 : 0.4,
+          }}
+        />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span
             style={{
@@ -371,7 +335,7 @@ function NodeCard({
               color: color.main,
               background: color.dim,
               border: `1px solid ${color.border}`,
-              borderRadius: shape === 'pill' ? '10px' : shape === 'hexagonal' ? '2px' : '4px',
+              borderRadius: '4px',
               padding: '1px 5px',
             }}
           >
@@ -398,7 +362,7 @@ function NodeCard({
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '7.5px',
                 padding: '1px 5px',
-                borderRadius: shape === 'pill' ? '10px' : '8px',
+                borderRadius: '8px',
                 background: color.light,
                 color: color.main,
                 border: `1px solid ${color.border}`,
