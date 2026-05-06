@@ -236,23 +236,23 @@ function ConnectionLayer({ positions, connections, agents }: { positions: Positi
 function DragHandle({ color, onDragStart }: { color: string; onDragStart: (e: React.MouseEvent) => void }) {
   return (
     <div
-      onMouseDown={(e) => { e.stopPropagation(); onDragStart(e); }}
+      onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); onDragStart(e); }}
       style={{
-        position: 'absolute', top: 8, right: 8, width: 22, height: 22,
-        borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'grab', zIndex: 10, opacity: 0.4, transition: 'opacity 0.15s',
+        position: 'absolute', top: 6, right: 6, width: 32, height: 32,
+        borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'grab', zIndex: 10, opacity: 0.35, transition: 'opacity 0.15s, background 0.15s',
         background: 'transparent',
       }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.opacity = '0.4'; }}
+      onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.opacity = '0.9'; el.style.background = 'oklch(0 0 0 / 0.04)'; }}
+      onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.opacity = '0.35'; el.style.background = 'transparent'; }}
     >
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <circle cx="4" cy="3" r="1" fill={color} />
-        <circle cx="8" cy="3" r="1" fill={color} />
-        <circle cx="4" cy="6" r="1" fill={color} />
-        <circle cx="8" cy="6" r="1" fill={color} />
-        <circle cx="4" cy="9" r="1" fill={color} />
-        <circle cx="8" cy="9" r="1" fill={color} />
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="4.5" cy="3" r="1.3" fill={color} />
+        <circle cx="9.5" cy="3" r="1.3" fill={color} />
+        <circle cx="4.5" cy="7" r="1.3" fill={color} />
+        <circle cx="9.5" cy="7" r="1.3" fill={color} />
+        <circle cx="4.5" cy="11" r="1.3" fill={color} />
+        <circle cx="9.5" cy="11" r="1.3" fill={color} />
       </svg>
     </div>
   );
@@ -282,6 +282,7 @@ function NodeCard({
 
   return (
     <div
+      data-node-id={agent.id}
       style={{
         position: 'absolute',
         left: pos.x,
@@ -553,21 +554,25 @@ export default function OrchestrationGraph({ orchestration, projectName, project
   const [dims, setDims] = useState({ W: 1200, H: 800 });
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const dragRef = useRef<{ id: string; offsetX: number; offsetY: number } | null>(null);
+  const didDragRef = useRef(false);
 
   const handleDragStart = useCallback((id: string, e: React.MouseEvent) => {
-    const pos = positions[id];
-    if (!pos) return;
-    dragRef.current = { id, offsetX: e.clientX - pos.x, offsetY: e.clientY - pos.y };
+    const nodeEl = (e.target as HTMLElement).closest('[data-node-id]');
+    const rect = nodeEl?.getBoundingClientRect();
+    if (!rect) return;
+
+    dragRef.current = { id, offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top };
+    didDragRef.current = false;
     setDraggingId(id);
 
     const onMove = (ev: MouseEvent) => {
       if (!dragRef.current) return;
+      didDragRef.current = true;
+      const newX = ev.clientX - dragRef.current.offsetX;
+      const newY = ev.clientY - dragRef.current.offsetY;
       setPositions((prev) => ({
         ...prev,
-        [dragRef.current!.id]: {
-          x: ev.clientX - dragRef.current!.offsetX,
-          y: ev.clientY - dragRef.current!.offsetY,
-        },
+        [dragRef.current!.id]: { x: newX, y: newY },
       }));
     };
 
@@ -580,7 +585,7 @@ export default function OrchestrationGraph({ orchestration, projectName, project
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
-  }, [positions]);
+  }, []);
 
   const compute = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -757,7 +762,7 @@ export default function OrchestrationGraph({ orchestration, projectName, project
             index={i}
             pos={positions[agent.id]}
             selected={selected === agent.id}
-            onClick={(id) => { if (!draggingId) setSelected((prev) => (prev === id ? null : id)); }}
+            onClick={(id) => { if (!didDragRef.current) setSelected((prev) => (prev === id ? null : id)); }}
             onDrag={handleDragStart}
             isDragging={draggingId === agent.id}
           />
