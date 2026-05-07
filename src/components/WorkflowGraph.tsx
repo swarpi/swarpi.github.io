@@ -51,7 +51,7 @@ const NODES: NodeData[] = [
     description:
       'Asks clarifying questions and explores alternatives before any code is written. Produces Architecture Decision Records (ADRs) and detailed specs — the north star for all downstream work.',
     outputs: ['ADRs', 'Specs', 'Constraints'],
-    docLink: 'https://github.com/swarpi/agentic-workflow/blob/main/prompts/architect.md',
+    docLink: 'https://github.com/swarpi/agent-eng/blob/main/src/templates/.claude/agents/architect.md',
   },
   {
     id: 'planner',
@@ -69,7 +69,7 @@ const NODES: NodeData[] = [
     description:
       'Takes ADRs and specs as input. Decomposes the work into discrete, actionable tickets — each with clear acceptance criteria — that the Executor can pick up without ambiguity.',
     outputs: ['Tickets', 'Milestones', 'Criteria'],
-    docLink: 'https://github.com/swarpi/agentic-workflow/blob/main/prompts/planner.md',
+    docLink: 'https://github.com/swarpi/agent-eng/blob/main/src/templates/.claude/agents/planner.md',
   },
   {
     id: 'executor',
@@ -88,7 +88,7 @@ const NODES: NodeData[] = [
     description:
       'Implements tickets following established conventions. Always proposes a plan before touching the codebase — creating an audit trail and a review surface before any commits land.',
     outputs: ['Code', 'PRs', 'Plan docs'],
-    docLink: 'https://github.com/swarpi/agentic-workflow/blob/main/conventions/typescript.md',
+    docLink: 'https://github.com/swarpi/agent-eng/blob/main/src/templates/.claude/agents/executor.md',
   },
   {
     id: 'reviewer',
@@ -107,7 +107,7 @@ const NODES: NodeData[] = [
     description:
       'Validates code against the original acceptance criteria from the Planner. Flags issues back to the Executor and provides final approval when all criteria are met.',
     outputs: ['Feedback', 'Approval', 'Notes'],
-    docLink: 'https://github.com/swarpi/agentic-workflow/blob/main/prompts/reviewer.md',
+    docLink: 'https://github.com/swarpi/agent-eng/blob/main/src/templates/.claude/agents/reviewer.md',
   },
 ];
 
