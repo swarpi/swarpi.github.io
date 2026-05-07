@@ -2,7 +2,7 @@ import yaml from 'js-yaml';
 
 export interface Agent {
   id: string;
-  kind?: 'decision' | 'planning' | 'execution' | 'validation';
+  kind?: 'decision' | 'planning' | 'execution' | 'validation' | 'maintenance';
   title: string;
   tagline: string;
   description: string;

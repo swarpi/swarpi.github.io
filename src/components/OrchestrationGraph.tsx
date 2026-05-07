@@ -48,6 +48,14 @@ const ICONS: Record<string, React.ReactNode> = {
       <rect x="11" y="11" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   ),
+  'system-architect': (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="5" cy="15" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="15" cy="15" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M10 7.5v3M8.5 12l-2 1M11.5 12l2 1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  ),
   planner: (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <path d="M4 6h12M4 10h8M4 14h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -71,6 +79,13 @@ const ICONS: Record<string, React.ReactNode> = {
       <path d="M7 9l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  custodian: (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M6 13c0 2.5 1.8 4 4 4s4-1.5 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 7l6 2M7 9l6-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  ),
   default: (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
       <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" />
@@ -79,7 +94,7 @@ const ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-type AgentKind = 'decision' | 'planning' | 'execution' | 'validation';
+type AgentKind = 'decision' | 'planning' | 'execution' | 'validation' | 'maintenance';
 
 function getAccentElements(kind: AgentKind | undefined, colorMain: string, active: boolean) {
   const opacity = active ? 1 : 0.4;
@@ -95,6 +110,8 @@ function getAccentElements(kind: AgentKind | undefined, colorMain: string, activ
         { ...base, top: 0, left: 0, right: 0, height: '1.5px', borderRadius: '12px 12px 0 0' },
         { ...base, bottom: 0, left: 0, right: 0, height: '1.5px', borderRadius: '0 0 12px 12px' },
       ];
+    case 'maintenance':
+      return [{ ...base, top: 0, right: 0, bottom: 0, width: '3px', borderRadius: '0 12px 12px 0' }];
     case 'planning':
     default:
       return [{ ...base, top: 0, left: 0, right: 0, height: '2.5px', borderRadius: '12px 12px 0 0' }];
