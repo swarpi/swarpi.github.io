@@ -1,0 +1,483 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About" description="About Trung Duc Nguyen — software engineer based in Berlin">
+  <section class="about-hero">
+    <h1 class="reveal">About<br />me</h1>
+    <div class="about-intro reveal reveal-delay-1">
+      <p>
+        Software engineer based in Berlin. M.Sc. in Information Systems Management from TU Berlin.
+        I build things with TypeScript, Python, and Java — and I'm interested in how LLMs can augment human expertise
+        in software engineering workflows.
+      </p>
+      <div class="socials">
+        <a href="https://github.com/swarpi" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="mailto:nguyendtrung15@gmail.com" aria-label="Email">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="powers reveal">
+    <h2>What I work with</h2>
+    <div class="skills-grid">
+      <div class="skill-group reveal reveal-delay-1">
+        <h3>Languages</h3>
+        <p>TypeScript, Python, Java, SQL, Dart, C#</p>
+      </div>
+      <div class="skill-group reveal reveal-delay-2">
+        <h3>Technologies</h3>
+        <p>React, Docker, Firebase, Supabase, MySQL, MongoDB, ChromaDB, Flutter, AWS</p>
+      </div>
+      <div class="skill-group reveal reveal-delay-3">
+        <h3>Interests</h3>
+        <p>LLM-augmented development, agentic workflows, real-time systems</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="experience reveal">
+    <h2>Experience</h2>
+    <div class="exp-grid">
+      <div class="exp-entry reveal">
+        <div class="exp-meta">
+          <h3>2023</h3>
+        </div>
+        <div class="exp-content">
+          <h3>Founders Associate</h3>
+          <h4>cliqe</h4>
+          <p>Built onboarding automation with TypeScript + Firebase (3 min &rarr; 30 sec) and an outreach system with Python that scaled daily reach from 600 to 1,000.</p>
+        </div>
+      </div>
+      <div class="exp-entry reveal">
+        <div class="exp-meta">
+          <h3>2022 &ndash; 2023</h3>
+        </div>
+        <div class="exp-content">
+          <h3>ERP Business Analyst</h3>
+          <h4>Capgemini</h4>
+          <p>Wrote user stories for an Oracle ERP system. Established a Confluence documentation process for 20+ project documents.</p>
+        </div>
+      </div>
+      <div class="exp-entry reveal">
+        <div class="exp-meta">
+          <h3>2019 &ndash; 2021</h3>
+        </div>
+        <div class="exp-content">
+          <h3>Academic Tutor</h3>
+          <h4>TU Berlin</h4>
+          <p>Taught technical foundations and advanced Java programming. Graded work on concurrency, deadlock prevention, and thread synchronization.</p>
+        </div>
+      </div>
+      <div class="exp-entry reveal">
+        <div class="exp-meta">
+          <h3>2018 &ndash; 2019</h3>
+        </div>
+        <div class="exp-content">
+          <h3>Automotive QA Engineer</h3>
+          <h4>Capgemini</h4>
+          <p>JUnit testing and debugging for a complex Java automotive system. Optimized MySQL queries for large-scale data processing. Collaborated across teams in Germany and India.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="featured reveal">
+    <h2>Selected Projects</h2>
+    <div class="project-grid">
+      <div class="project-item reveal reveal-delay-1">
+        <h3>Real-time multiplayer game</h3>
+        <p>Led a 3-person team building a cross-platform party game with Flutter, Dart, and Supabase. Designed a custom Stream-based architecture for real-time sync across mobile and web.</p>
+      </div>
+      <div class="project-item reveal reveal-delay-2">
+        <h3>LLM recommender system</h3>
+        <p>Master's thesis. Used LLaMA3 for generation and RoBERTa for embeddings, with ChromaDB and cosine similarity for retrieval.</p>
+      </div>
+      <div class="project-item reveal reveal-delay-1">
+        <h3>AAS Dashboard</h3>
+        <p>React + TypeScript dashboard for managing Asset Administration Shells, containerized with Docker.</p>
+      </div>
+      <div class="project-item reveal reveal-delay-2">
+        <h3>Satellite image classification</h3>
+        <p>ML pipeline with Python and Keras to classify building locations from satellite imagery.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="education reveal">
+    <h2>Education</h2>
+    <div class="edu-grid">
+      <div class="edu-entry reveal">
+        <div class="edu-meta">
+          <h3>2020 &ndash; 2025</h3>
+        </div>
+        <div class="edu-content">
+          <h3>M.Sc. Information Systems Management</h3>
+          <h4>TU Berlin</h4>
+          <p>IT Management, Data Science, Machine Learning</p>
+        </div>
+      </div>
+      <div class="edu-entry reveal">
+        <div class="edu-meta">
+          <h3>2021 &ndash; 2022</h3>
+        </div>
+        <div class="edu-content">
+          <h3>Exchange Year</h3>
+          <h4>Hanyang University, South Korea</h4>
+          <p>Entrepreneurship and Marketing</p>
+        </div>
+      </div>
+      <div class="edu-entry reveal">
+        <div class="edu-meta">
+          <h3>2017 &ndash; 2020</h3>
+        </div>
+        <div class="edu-content">
+          <h3>B.Sc. Business Informatics</h3>
+          <h4>TU Berlin</h4>
+          <p>Thesis: Serious game teaching children about sustainability (A+)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bottom reveal">
+    <div class="bottom-grid">
+      <div>
+        <h3>Languages</h3>
+        <p>German, English, Vietnamese</p>
+      </div>
+      <div>
+        <h3>Get in touch</h3>
+        <p>
+          <a href="https://github.com/swarpi">GitHub</a> &middot;
+          <a href="mailto:nguyendtrung15@gmail.com">Email</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero — large display heading like taamannae about page */
+  .about-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    padding-bottom: var(--space-xl);
+  }
+
+  .about-hero h1 {
+    font-size: clamp(3rem, 8vw, 7.5rem);
+    font-weight: 900;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    line-height: 0.9;
+    margin: 0;
+  }
+
+  .about-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .about-intro p {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-bottom: var(--space-sm);
+  }
+
+  .socials {
+    display: flex;
+    gap: 4px;
+    margin-left: -8px;
+  }
+
+  .socials a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 100px;
+    color: var(--color-text);
+    transition: background-color 0.3s ease;
+  }
+
+  .socials a:hover {
+    background-color: var(--color-nav-hover);
+  }
+
+  /* Powers / Skills — with top border like taamannae */
+  .powers {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .powers h2 {
+    margin-top: 0;
+    margin-bottom: var(--space-md);
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+
+  .skill-group {
+    padding: var(--space-md);
+    background-color: var(--color-bg-alt);
+    border-radius: 12px;
+  }
+
+  .skill-group h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .skill-group p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  /* Experience — date/content grid like taamannae */
+  .experience {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .experience h2 {
+    font-family: var(--font-body);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 900;
+    margin: 0 0 var(--space-lg);
+  }
+
+  .exp-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .exp-entry {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .exp-entry:last-child {
+    border-bottom: none;
+  }
+
+  .exp-meta h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--color-text-dim);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .exp-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    line-height: 1.5;
+  }
+
+  .exp-content h3:first-of-type {
+    color: var(--color-text);
+  }
+
+  .exp-content h4 {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .exp-content p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* Featured projects */
+  .featured {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .featured h2 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 900;
+    margin: 0 0 var(--space-lg);
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .project-item {
+    padding: var(--space-md);
+    background-color: var(--color-bg-alt);
+    border-radius: 12px;
+    transition: transform 0.4s ease;
+  }
+
+  .project-item:hover {
+    transform: scale(1.03);
+  }
+
+  .project-item h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .project-item p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* Education — same grid pattern as experience */
+  .education {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .education > h2 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 900;
+    margin: 0 0 var(--space-lg);
+  }
+
+  .edu-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .edu-entry {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .edu-entry:last-child {
+    border-bottom: none;
+  }
+
+  .edu-meta h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--color-text-dim);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .edu-content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    line-height: 1.5;
+  }
+
+  .edu-content h4 {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .edu-content p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  /* Bottom section */
+  .bottom {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+  }
+
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+  }
+
+  .bottom h3 {
+    font-weight: 800;
+    font-size: 1rem;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .bottom p {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .bottom a {
+    color: var(--color-text);
+    font-weight: 700;
+    transition: all 0.3s ease;
+  }
+
+  .bottom a:hover {
+    color: var(--color-accent);
+  }
+
+  /* Responsive */
+  @media (max-width: 991px) {
+    .about-hero {
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+    }
+
+    .exp-entry,
+    .edu-entry {
+      grid-template-columns: 1fr;
+      gap: var(--space-xs);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .skills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .project-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .bottom-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-md);
+    }
+  }
+</style>

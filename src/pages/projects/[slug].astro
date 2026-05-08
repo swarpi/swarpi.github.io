@@ -22,20 +22,20 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
 
 <BaseLayout title={project.name} description={project.description}>
   <article>
-    <header>
+    <header class="reveal">
       <h1>{project.name}</h1>
       <p class="description">{project.description}</p>
       <div class="meta">
-        {project.language && <span class="language">{project.language}</span>}
+        {project.language && <span class="language-badge">{project.language}</span>}
         <span>Updated {formattedDate}</span>
         <a href={project.url} target="_blank" rel="noopener noreferrer">
-          View on GitHub
+          View on GitHub &rarr;
         </a>
       </div>
     </header>
 
     {project.readme && (
-      <section class="readme">
+      <section class="readme reveal">
         <h2>README</h2>
         <pre><code>{project.readme}</code></pre>
       </section>
@@ -45,33 +45,59 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
 
 <style>
   header {
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
   }
 
   h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
     margin-top: 0;
+    margin-bottom: var(--space-sm);
+    line-height: 1;
   }
 
   .description {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    font-weight: 600;
     color: var(--color-text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-md);
+    max-width: 60ch;
+    line-height: 1.7;
   }
 
   .meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    align-items: center;
   }
 
-  .language {
-    font-weight: 500;
+  .language-badge {
+    font-weight: 700;
+    color: var(--color-text-muted);
+    background-color: var(--color-bg-alt);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .meta a {
+    font-weight: 700;
+    transition: all 0.3s ease;
   }
 
   .readme h2 {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
   }
 
   .readme pre {

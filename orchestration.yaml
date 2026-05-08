@@ -1,0 +1,134 @@
+name: Agentic Workflow
+description: Seven-role pipeline for AI-assisted software engineering
+
+agents:
+  - id: architect
+    kind: decision
+    title: Architect
+    tagline: Shapes the system before anything is built
+    description: Asks clarifying questions and explores alternatives before any code is written. Produces Architecture Decision Records (ADRs) and detailed specs.
+    outputs:
+      - ADRs
+      - Specs
+      - Constraints
+    color: indigo
+    docLink: /.claude/agents/architect.md
+
+  - id: system-architect
+    kind: decision
+    title: System Architect
+    tagline: Maps the runtime system architecture
+    description: Identifies components, connections, protocols, and tiers. Produces a structured architecture.yaml that documents how the system fits together.
+    outputs:
+      - architecture.yaml
+      - Component map
+      - Connection diagram
+    color: green
+    docLink: /.claude/agents/system-architect.md
+
+  - id: planner
+    kind: planning
+    title: Planner
+    tagline: Decomposes specs into actionable work
+    description: Takes ADRs and specs as input. Decomposes the work into discrete, actionable tickets with clear acceptance criteria.
+    outputs:
+      - Tickets
+      - Milestones
+      - Criteria
+    color: indigo
+    docLink: /.claude/agents/planner.md
+
+  - id: executor
+    kind: execution
+    title: Executor
+    tagline: Implements with intent and discipline
+    description: Implements tickets following established conventions. Always proposes a plan before touching the codebase.
+    outputs:
+      - Code
+      - PRs
+      - Plan docs
+    color: indigo
+    docLink: /.claude/agents/executor.md
+
+  - id: qa-tester
+    kind: validation
+    title: QA Tester
+    tagline: Writes automated tests for completed features
+    description: Writes automated tests after the Executor finishes a feature. Covers acceptance criteria, edge cases, and regression scenarios.
+    outputs:
+      - Tests
+      - Coverage report
+      - Test plan
+    color: green
+    docLink: /.claude/agents/qa-tester.md
+
+  - id: reviewer
+    kind: validation
+    title: Reviewer
+    tagline: Validates against acceptance criteria
+    description: Validates code and tests against the original acceptance criteria. Flags issues back to the Executor and provides final approval.
+    outputs:
+      - Feedback
+      - Approval
+      - Notes
+    color: amber
+    docLink: /.claude/agents/reviewer.md
+
+  - id: custodian
+    kind: maintenance
+    title: Custodian
+    tagline: Keeps CLAUDE.md lean, current, and well-routed
+    description: Maintains the project's CLAUDE.md file — adds new patterns and gotchas, removes stale entries, and routes large content to external files. Enforces a 150–200 line limit to prevent context bloat.
+    outputs:
+      - Updated CLAUDE.md
+      - Extracted reference files
+    color: blue
+    docLink: /.claude/agents/custodian.md
+
+connections:
+  - from: architect
+    to: system-architect
+    artifact: ADRs · Specs
+
+  - from: system-architect
+    to: planner
+    artifact: architecture.yaml
+
+  - from: planner
+    to: executor
+    artifact: Tickets
+
+  - from: executor
+    to: qa-tester
+    artifact: Code
+
+  - from: qa-tester
+    to: reviewer
+    artifact: Code · Tests
+
+  - from: reviewer
+    to: executor
+    artifact: Feedback
+    type: feedback
+
+  - from: reviewer
+    to: custodian
+    artifact: Completed work context
+    type: trigger
+
+parallelization:
+  description: >
+    The main session can deploy sub-agents for independent, parallelizable work.
+    Sub-agents run in isolation, report back, and the main thread synthesizes results.
+  model-routing:
+    low-complexity: haiku
+    medium-complexity: sonnet
+    high-complexity: opus
+  default-model: haiku
+  examples:
+    - parallel research across multiple files
+    - running independent test suites simultaneously
+    - implementing tickets with no dependencies on each other
+    - concurrent verification (browser + console + tests)
+
+layout: diamond

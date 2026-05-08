@@ -1,8 +1,8 @@
 ---
-import type { ShowcaseProject } from '@/lib/github';
+import type { ProjectWithOrchestration } from '@/lib/orchestration';
 
 interface Props {
-  project: ShowcaseProject;
+  project: ProjectWithOrchestration;
 }
 
 const { project } = Astro.props;
@@ -13,7 +13,7 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
 });
 ---
 
-<a href={project.url} target="_blank" rel="noopener noreferrer" class="project-card">
+<a href={`/workflow/${project.name}`} class="workflow-project-card">
   <div class="card-content">
     <div class="card-top">
       <div class="comp-section">
@@ -29,7 +29,7 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
 </a>
 
 <style>
-  .project-card {
+  .workflow-project-card {
     display: block;
     border-radius: 12px;
     background-color: var(--color-bg-alt);
@@ -39,8 +39,8 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
     height: 100%;
   }
 
-  .project-card:hover {
-    transform: scale(1.05);
+  .workflow-project-card:hover {
+    transform: scale(1.03);
     text-decoration: none;
     color: var(--color-text);
   }
@@ -80,8 +80,6 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--color-text-dim);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     flex-shrink: 0;
   }
 

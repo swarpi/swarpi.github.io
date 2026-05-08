@@ -1,0 +1,430 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { fetchProjectsWithOrchestrations } from '@/lib/orchestration';
+import type { ProjectWithOrchestration } from '@/lib/orchestration';
+
+export async function getStaticPaths() {
+  const projects = await fetchProjectsWithOrchestrations();
+
+  return projects.map((project) => ({
+    params: { slug: project.name },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: ProjectWithOrchestration;
+}
+
+const { project } = Astro.props;
+const hasOrchestration = !!project.orchestration;
+const hasArchitecture = !!project.architecture;
+
+const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={project.name} description={project.description}>
+  <article class="hub">
+    <!-- Back -->
+    <a href="/workflow" class="back reveal">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 3L5 7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      Workflow
+    </a>
+
+    <!-- Hero -->
+    <header class="hero reveal">
+      <h1>{project.name}</h1>
+      <p class="lead">{project.description}</p>
+      <div class="meta">
+        {project.language && <span class="badge">{project.language}</span>}
+        <span class="date">Updated {formattedDate}</span>
+        <a href={project.url} target="_blank" rel="noopener noreferrer" class="gh-link">
+          View on GitHub &rarr;
+        </a>
+      </div>
+    </header>
+
+    <!-- Agent Pipeline -->
+    {hasOrchestration && project.orchestration && (
+      <section class="section reveal reveal-delay-1">
+        <h2>Agent Pipeline</h2>
+        <p class="section-lead">{project.orchestration.description}</p>
+
+        <div class="pipeline">
+          {project.orchestration.agents.map((agent, i) => (
+            <div class="pipeline-item">
+              <div class="pipeline-marker">
+                <span class="index">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              <div class="pipeline-body">
+                <h3>{agent.title}</h3>
+                <p>{agent.description}</p>
+                {agent.outputs.length > 0 && (
+                  <div class="tags">
+                    {agent.outputs.map((o) => (
+                      <span class="tag">{o}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="graph-placeholder reveal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="12" r="3" />
+            <circle cx="19" cy="6" r="3" />
+            <circle cx="19" cy="18" r="3" />
+            <path d="M8 11l8-4M8 13l8 4" />
+          </svg>
+          <span>Interactive workflow graph coming soon</span>
+        </div>
+      </section>
+    )}
+
+    <!-- Architecture -->
+    {hasArchitecture && project.architecture && (
+      <section class="section reveal reveal-delay-2">
+        <h2>System Architecture</h2>
+        <p class="section-lead">{project.architecture.description}</p>
+
+        <div class="arch-list">
+          {project.architecture.components.map((comp) => (
+            <div class="arch-item">
+              <div class="arch-header">
+                <h3>{comp.title}</h3>
+                <span class="tier">{comp.tier}</span>
+              </div>
+              <p class="arch-desc">{comp.description}</p>
+              <span class="tech">{comp.technology}</span>
+              {comp.subcomponents && comp.subcomponents.length > 0 && (
+                <div class="subs">
+                  {comp.subcomponents.map((sub) => (
+                    <div class="sub">
+                      <span class="sub-name">{sub.name}</span>
+                      <span class="sub-sep"> — </span>
+                      <span class="sub-detail">{sub.detail}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div class="graph-placeholder reveal">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
+            <path d="M10 10l-1.5 4M14 10l1.5 4" />
+          </svg>
+          <span>Interactive architecture graph coming soon</span>
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .hub {
+    max-width: 860px;
+  }
+
+  /* Back link */
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    margin-bottom: var(--space-lg);
+    transition: color 0.2s ease;
+  }
+
+  .back:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+    line-height: 0.95;
+  }
+
+  .lead {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    max-width: 55ch;
+    line-height: 1.7;
+    margin-bottom: var(--space-md);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: center;
+  }
+
+  .badge {
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-dim);
+    background-color: var(--color-bg-alt);
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1.5px solid var(--color-border);
+  }
+
+  .date {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+  }
+
+  .gh-link {
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1.5px solid var(--color-border);
+    color: var(--color-text-dim);
+    transition: all 0.2s ease;
+  }
+
+  .gh-link:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-dim);
+    text-decoration: none;
+  }
+
+  /* Sections */
+  .section {
+    margin-bottom: var(--space-xl);
+  }
+
+  .section h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    font-variation-settings: 'opsz' 72, 'WONK' 1;
+    margin-top: 0;
+    margin-bottom: var(--space-xs);
+  }
+
+  .section-lead {
+    color: var(--color-text-muted);
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: var(--space-lg);
+    padding-left: var(--space-sm);
+    border-left: 3px solid var(--color-border);
+  }
+
+  /* Pipeline */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: var(--space-lg);
+  }
+
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 28px;
+    bottom: 28px;
+    width: 1px;
+    background: var(--color-border);
+  }
+
+  .pipeline-item {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+  }
+
+  .pipeline-marker {
+    flex-shrink: 0;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    padding-top: 2px;
+  }
+
+  .index {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    background: var(--color-bg);
+    position: relative;
+    z-index: 1;
+    padding: 2px 0;
+  }
+
+  .pipeline-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .pipeline-body h3 {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+
+  .pipeline-body p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0 0 8px;
+  }
+
+  .tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: var(--color-bg-alt);
+    color: var(--color-text-dim);
+    border: 1px solid var(--color-border);
+  }
+
+  /* Architecture */
+  .arch-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+
+  .arch-item {
+    background: var(--color-bg-alt);
+    border-radius: 12px;
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .arch-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .arch-header h3 {
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .tier {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-dim);
+  }
+
+  .arch-desc {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0 0 4px;
+  }
+
+  .tech {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+  }
+
+  .subs {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sub {
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--color-text-dim);
+  }
+
+  .sub-name {
+    font-weight: 700;
+    color: var(--color-text-muted);
+  }
+
+  /* Graph placeholder */
+  .graph-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 120px;
+    border: 2px dashed var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 640px) {
+    .hub {
+      max-width: 100%;
+    }
+
+    .pipeline-marker {
+      width: 30px;
+    }
+
+    .pipeline::before {
+      left: 14px;
+    }
+
+    .pipeline-item {
+      gap: var(--space-sm);
+    }
+  }
+</style>

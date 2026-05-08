@@ -1,164 +1,57 @@
-<div class="theme-dropdown">
-  <button class="theme-btn" aria-label="Toggle theme" title="Toggle theme">
-    <svg class="icon icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5" />
-      <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-    </svg>
-    <svg class="icon icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M13.5 9.2A5.5 5.5 0 016.8 2.5 5.5 5.5 0 108 13.5a5.5 5.5 0 005.5-4.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-    </svg>
-    <svg class="icon icon-system" width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x="2" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5" />
-      <path d="M5.5 14h5M8 11v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-    </svg>
-  </button>
-  <div class="theme-menu" hidden>
-    <button data-theme-value="light" class="theme-option">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5" />
-        <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-      Light
-    </button>
-    <button data-theme-value="dark" class="theme-option">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <path d="M13.5 9.2A5.5 5.5 0 016.8 2.5 5.5 5.5 0 108 13.5a5.5 5.5 0 005.5-4.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-      </svg>
-      Dark
-    </button>
-    <button data-theme-value="system" class="theme-option">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-        <rect x="2" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5" />
-        <path d="M5.5 14h5M8 11v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-      </svg>
-      System
-    </button>
-  </div>
-</div>
+<button class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+  <svg class="icon icon-sun" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5" />
+    <path d="M8 1.5v1M8 13.5v1M1.5 8h1M13.5 8h1M3.4 3.4l.7.7M11.9 11.9l.7.7M3.4 12.6l.7-.7M11.9 4.1l.7-.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+  </svg>
+  <svg class="icon icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M13.5 9.2A5.5 5.5 0 016.8 2.5 5.5 5.5 0 108 13.5a5.5 5.5 0 005.5-4.3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+  </svg>
+</button>
 
 <style is:global>
-  .theme-dropdown {
-    position: relative;
-  }
-
-  .theme-btn {
+  .theme-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid var(--color-border);
-    background: var(--color-bg);
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-  }
-
-  .theme-btn:hover {
-    color: var(--color-text);
-    border-color: var(--color-text-muted);
-  }
-
-  .theme-btn .icon { display: none; }
-  :root:not([data-theme]) .theme-btn .icon-system { display: block; }
-  [data-theme="light"] .theme-btn .icon-sun { display: block; }
-  [data-theme="dark"] .theme-btn .icon-moon { display: block; }
-
-  .theme-menu {
-    position: absolute;
-    top: calc(100% + 6px);
-    right: 0;
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: 10px;
-    padding: 4px;
-    box-shadow: 0 4px 16px oklch(0 0 0 / 0.1);
-    min-width: 120px;
-    z-index: 500;
-  }
-
-  .theme-menu[hidden] { display: none; }
-
-  .theme-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    padding: 7px 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 100px;
     border: none;
-    border-radius: 6px;
     background: transparent;
-    color: var(--color-text-muted);
-    font-family: var(--font-sans);
-    font-size: 13px;
+    color: var(--color-text-dim);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  .theme-option:hover {
-    background: var(--color-bg-alt);
+  .theme-toggle:hover {
+    background-color: var(--color-nav-hover);
     color: var(--color-text);
   }
 
-  .theme-option.active {
-    color: var(--color-accent);
-    font-weight: 500;
+  .theme-toggle .icon { display: none; }
+  :root:not([data-theme]) .theme-toggle .icon-sun { display: block; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+  [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) .theme-toggle .icon-sun { display: none; }
+    :root:not([data-theme]) .theme-toggle .icon-moon { display: block; }
   }
 </style>
 
 <script>
   function initThemeToggle() {
-    const dropdown = document.querySelector('.theme-dropdown');
-    if (!dropdown) return;
-    const btn = dropdown.querySelector('.theme-btn') as HTMLButtonElement;
-    const menu = dropdown.querySelector('.theme-menu') as HTMLElement;
-    const options = dropdown.querySelectorAll('.theme-option') as NodeListOf<HTMLButtonElement>;
+    const btn = document.querySelector('.theme-toggle') as HTMLButtonElement;
+    if (!btn) return;
 
-    function getTheme(): string {
-      const stored = localStorage.getItem('theme');
-      if (stored === 'light' || stored === 'dark') return stored;
-      return 'system';
-    }
-
-    function apply(theme: string) {
-      if (theme === 'system') {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.removeItem('theme');
-      } else {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-      }
-      updateActive();
-    }
-
-    function updateActive() {
-      const current = getTheme();
-      options.forEach((opt) => {
-        opt.classList.toggle('active', opt.dataset.themeValue === current);
-      });
-    }
-
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = !menu.hidden;
-      menu.hidden = isOpen;
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const effectiveTheme = current || (prefersDark ? 'dark' : 'light');
+      const next = effectiveTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
     });
-
-    options.forEach((opt) => {
-      opt.addEventListener('click', () => {
-        apply(opt.dataset.themeValue || 'system');
-        menu.hidden = true;
-      });
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target as Node)) {
-        menu.hidden = true;
-      }
-    });
-
-    updateActive();
   }
 
   initThemeToggle();

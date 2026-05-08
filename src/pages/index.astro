@@ -1,64 +1,323 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { fetchShowcaseProjects } from '@/lib/github';
+
+const projects = await fetchShowcaseProjects();
 ---
 
 <BaseLayout title="Home">
-  <section class="intro">
-    <h1>Hi, I'm swarpi</h1>
-    <p class="tagline">
-      Software engineer. Building things with TypeScript, Python, and Java.
-    </p>
+  <section class="jumbotron">
+    <div class="left">
+      <h2 class="reveal">Software</h2>
+      <h1 class="reveal reveal-delay-1">Engineer</h1>
+      <p class="subtitle reveal reveal-delay-2">
+        Building things with TypeScript, Python, and Java —
+        exploring how LLMs can augment human expertise in software engineering.
+      </p>
+      <div class="socials reveal reveal-delay-3">
+        <a href="https://github.com/swarpi" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="mailto:nguyendtrung15@gmail.com" aria-label="Email">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="right">
+      <div class="right-content reveal">
+        <h3>Based in Berlin</h3>
+        <h4>M.Sc. Information Systems Management, TU Berlin</h4>
+        <p class="job-desc">
+          Currently exploring agentic workflows and LLM-augmented development.
+          Previously at cliqe, Capgemini, and TU Berlin.
+        </p>
+        <div class="quick-links">
+          <a href="/about">About me &rarr;</a>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="links">
-    <h2>Explore</h2>
-    <ul>
-      <li>
-        <a href="/workflow">My Workflow</a> — How I work with AI agents to build software
-      </li>
-      <li>
-        <a href="/projects">Projects</a> — Open source work and experiments
-      </li>
-      <li>
-        <a href="/writing">Writing</a> — Essays and notes
-      </li>
-    </ul>
+  <section class="home-projects">
+    <h2 class="reveal">Selected Work</h2>
+    <div class="home-card-container">
+      {projects.length > 0 ? (
+        projects.slice(0, 6).map((project, i) => (
+          <div class:list={['reveal', `reveal-delay-${(i % 3) + 1}`]}>
+            <ProjectCard project={project} />
+          </div>
+        ))
+      ) : (
+        <p class="empty reveal">Projects coming soon.</p>
+      )}
+    </div>
+    {projects.length > 0 && (
+      <div class="view-all reveal">
+        <a href="/projects">View all projects &rarr;</a>
+      </div>
+    )}
+  </section>
+
+  <section class="home-explore reveal">
+    <div class="explore-grid">
+      <a href="/workflow" class="explore-card">
+        <span class="explore-label">Explore</span>
+        <h3>My Workflow</h3>
+        <p>How I work with AI agents to build software</p>
+      </a>
+      <a href="/writing" class="explore-card">
+        <span class="explore-label">Read</span>
+        <h3>Writing</h3>
+        <p>Essays, notes, and thoughts</p>
+      </a>
+    </div>
   </section>
 </BaseLayout>
 
 <style>
-  .intro {
-    margin: 3rem 0;
+  /* Jumbotron — split hero matching taamannae.dev structure */
+  .jumbotron {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    min-height: 70vh;
   }
 
-  h1 {
-    margin-top: 0;
+  .left {
+    border-right: 1px solid var(--color-border);
+    padding: var(--space-lg) var(--space-lg) var(--space-lg) 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
-  .tagline {
-    font-size: 1.1rem;
+  .left h2 {
+    font-family: var(--font-body);
+    font-size: clamp(2.5rem, 5.5vw, 5rem);
+    font-weight: 800;
     color: var(--color-text-muted);
+    margin: 0;
+    padding-bottom: 0;
+    line-height: 1;
+    overflow: hidden;
   }
 
-  .links {
-    margin-top: 2rem;
+  .left h1 {
+    font-size: clamp(3rem, 7vw, 7rem);
+    font-weight: 900;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    line-height: 0.9;
+    margin: 0 0 var(--space-md);
+    overflow: hidden;
   }
 
-  .links h2 {
-    margin-top: 0;
-    font-size: 1.25rem;
+  .subtitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 48ch;
+    margin-bottom: var(--space-md);
   }
 
-  .links ul {
-    list-style: none;
-    padding: 0;
+  .socials {
+    display: flex;
+    gap: 4px;
+    margin-left: -8px;
   }
 
-  .links li {
-    margin-bottom: 0.75rem;
+  .socials a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 100px;
+    color: var(--color-text);
+    transition: background-color 0.3s ease;
   }
 
-  .links a {
+  .socials a:hover {
+    background-color: var(--color-nav-hover);
+  }
+
+  .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-lg) 0 var(--space-lg) var(--space-lg);
+  }
+
+  .right h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin: 0 0 0;
+  }
+
+  .right h4 {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0 0 var(--space-sm);
+  }
+
+  .job-desc {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.7;
+    margin-bottom: var(--space-sm);
+  }
+
+  .quick-links a {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text);
+    transition: all 0.3s ease;
+  }
+
+  .quick-links a:hover {
+    color: var(--color-accent);
+  }
+
+  /* Project cards section */
+  .home-projects {
+    padding: var(--space-xl) 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .home-projects h2 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 900;
+    margin: 0 0 var(--space-lg);
+  }
+
+  .home-card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+
+  .view-all {
+    margin-top: var(--space-lg);
+    text-align: center;
+  }
+
+  .view-all a {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-text);
+    padding: 12px 32px;
+    border-radius: 100px;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+
+  .view-all a:hover {
+    background-color: var(--color-nav-hover);
+    color: var(--color-text);
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+    grid-column: 1 / -1;
+  }
+
+  /* Explore section */
+  .home-explore {
+    padding: var(--space-xl) 0 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .explore-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .explore-card {
+    display: block;
+    padding: var(--space-md) var(--space-md) var(--space-lg);
+    background-color: var(--color-bg-alt);
+    border-radius: 12px;
+    color: var(--color-text);
+    transition: transform 0.4s ease;
+  }
+
+  .explore-card:hover {
+    transform: scale(1.03);
+    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .explore-label {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-dim);
+    margin-bottom: var(--space-sm);
+  }
+
+  .explore-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .explore-card p {
+    color: var(--color-text-muted);
+    font-size: 1rem;
     font-weight: 500;
+    margin: 0;
+  }
+
+  @media (max-width: 991px) {
+    .jumbotron {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .left {
+      border-right: none;
+      padding: var(--space-lg) 0;
+    }
+
+    .right {
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-lg) 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .home-card-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .explore-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .left h1 {
+      font-size: clamp(2.5rem, 10vw, 5rem);
+    }
+
+    .left h2 {
+      font-size: clamp(2rem, 8vw, 4rem);
+    }
+  }
+
+  @media (max-width: 576px) {
+    .home-card-container {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

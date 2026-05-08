@@ -1,43 +1,172 @@
 ---
-import ProjectGrid from '@/components/ProjectGrid';
-import ThemeToggle from '@/components/ThemeToggle.astro';
-import '@/styles/global.css';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import WorkflowProjectCard from '@/components/WorkflowProjectCard.astro';
 import { fetchProjectsWithOrchestrations } from '@/lib/orchestration';
 
 const projects = await fetchProjectsWithOrchestrations();
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Agent orchestrations for my projects" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Workflow | swarpi</title>
-    <script is:inline>
-      (function() {
-        var t = localStorage.getItem('theme');
-        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
-      })();
-    </script>
-    <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { width: 100%; min-height: 100vh; background: var(--wf-bg); }
-    </style>
-  </head>
-  <body>
-    <div class="theme-toggle-float">
-      <ThemeToggle />
+<BaseLayout title="Workflow" description="How I work with AI agents to build software">
+  <section class="header">
+    <h1 class="reveal">Workflow</h1>
+    <p class="intro reveal reveal-delay-1">
+      How I work with AI agents to build software. Each project below defines an agent orchestration
+      — a pipeline of specialized roles that collaborate to ship code.
+    </p>
+    <p class="hint reveal reveal-delay-2">
+      Click any project to explore its agent pipeline and architecture graph.
+    </p>
+  </section>
+
+  {projects.length > 0 ? (
+    <div class="workflow-grid">
+      {projects.map((project, i) => (
+        <div class:list={['reveal', `reveal-delay-${(i % 2) + 1}`]}>
+          <WorkflowProjectCard project={project} />
+        </div>
+      ))}
     </div>
-    <ProjectGrid client:load projects={projects} />
-    <style>
-      .theme-toggle-float {
-        position: fixed;
-        top: 16px;
-        right: 16px;
-        z-index: 100;
-      }
-    </style>
-  </body>
-</html>
+  ) : (
+    <p class="empty reveal">No showcase projects found.</p>
+  )}
+
+  <section class="workflow-info reveal">
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="12" cy="12" r="10" stroke-dasharray="4 3" />
+          </svg>
+        </div>
+        <h3>Agent Orchestration</h3>
+        <p>Each project can define a <code>orchestration.yaml</code> that specifies the agent roles, their responsibilities, and how they connect.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" />
+            <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
+            <path d="M10 10l-1.5 4M14 10l1.5 4" />
+          </svg>
+        </div>
+        <h3>System Architecture</h3>
+        <p>An <code>architecture.yaml</code> maps the runtime components, tiers, connections, and protocols of each project.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <h3>Interactive Graphs</h3>
+        <p>Explore pannable, zoomable visualizations of the agent workflow and system architecture for each project.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .header {
+    margin-bottom: var(--space-xl);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 900;
+    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    margin-top: 0;
+    margin-bottom: var(--space-sm);
+    line-height: 0.95;
+  }
+
+  .intro {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: 1.1rem;
+    max-width: 55ch;
+    line-height: 1.7;
+    margin-bottom: var(--space-xs);
+  }
+
+  .hint {
+    color: var(--color-text-dim);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-bottom: var(--space-xl);
+  }
+
+  .workflow-info {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-lg);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+  }
+
+  .info-card {
+    padding: var(--space-md);
+    background-color: var(--color-bg-alt);
+    border-radius: 12px;
+    transition: transform 0.4s ease;
+  }
+
+  .info-card:hover {
+    transform: scale(1.03);
+  }
+
+  .info-icon {
+    color: var(--color-text-dim);
+    margin-bottom: var(--space-sm);
+  }
+
+  .info-card h3 {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 var(--space-xs);
+  }
+
+  .info-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .info-card code {
+    font-size: 0.85em;
+    background-color: var(--color-border);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .workflow-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
