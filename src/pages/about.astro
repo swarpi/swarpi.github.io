@@ -8,8 +8,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     <div class="about-intro reveal reveal-delay-1">
       <p>
         Software engineer based in Berlin. M.Sc. in Information Systems Management from TU Berlin.
-        I build things with TypeScript, Python, and Java — and I'm interested in how LLMs can augment human expertise
-        in software engineering workflows.
+        Building things with TypeScript, Python, and Java &mdash;
+        shipping agentic workflows and AI-powered applications with Claude Code.
       </p>
       <div class="socials">
         <a href="https://github.com/swarpi" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
@@ -31,9 +31,13 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
       </div>
       <div class="skill-group reveal reveal-delay-2">
         <h3>Technologies</h3>
-        <p>React, Docker, Firebase, Supabase, MySQL, MongoDB, ChromaDB, Flutter, AWS</p>
+        <p>React, Spring Boot, Docker, Firebase, Supabase, GCP, Kubernetes, MySQL, MongoDB, Flutter</p>
       </div>
       <div class="skill-group reveal reveal-delay-3">
+        <h3>Agent Engineering</h3>
+        <p>AI agent orchestration, prompt engineering, Claude Code workflows, system design with AI tools</p>
+      </div>
+      <div class="skill-group reveal reveal-delay-4">
         <h3>Interests</h3>
         <p>LLM-augmented development, agentic workflows, real-time systems</p>
       </div>
@@ -43,6 +47,16 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
   <section class="experience reveal">
     <h2>Experience</h2>
     <div class="exp-grid">
+      <div class="exp-entry reveal">
+        <div class="exp-meta">
+          <h3>2025 &ndash; Present</h3>
+        </div>
+        <div class="exp-content">
+          <h3>Associate Engineer</h3>
+          <h4>Deutsche Bank</h4>
+          <p>Primary backend developer on Phoenix (Front-to-Back), a platform to automate self-service products for commercial banking and expand into new European markets starting with the Netherlands. First deliverable: B2B SEPA mandate management serving 45,000+ corporate clients in Germany. Built Java Spring Boot CRUD endpoints, drove cross-team integration with 3 internal platform teams, and co-designed a dynamic document generation system eliminating template proliferation. Built CI automation reducing frontend update time from 30&ndash;60 min to 2&ndash;5 min.</p>
+        </div>
+      </div>
       <div class="exp-entry reveal">
         <div class="exp-meta">
           <h3>2023</h3>
@@ -90,18 +104,30 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
     <h2>Selected Projects</h2>
     <div class="project-grid">
       <div class="project-item reveal reveal-delay-1">
+        <h3>agent-eng (npm package)</h3>
+        <p>Published CLI tool that scaffolds a structured agentic engineering workflow into any project. Five specialized Claude Code subagents, ADR templates, ticket structure, and language-specific conventions. Zero dependencies. Built entirely using AI-assisted development (Claude Code).</p>
+      </div>
+      <div class="project-item reveal reveal-delay-2">
+        <h3>Project Hub</h3>
+        <p>React 19 + TypeScript web app for visualizing and editing agentic workflows and system architectures. Interactive diagram builder with XYFlow, undo/redo, auto-layout, and bidirectional YAML import/export. Built entirely using AI-assisted development (Claude Code).</p>
+      </div>
+      <div class="project-item reveal reveal-delay-1">
+        <h3>AI TTRPG</h3>
+        <p>Real-time voice-powered D&amp;D Game Master. Players speak via WebRTC; the system classifies intent with semantic routing (&lt;15ms), resolves combat deterministically through a FastMCP rules engine, and narrates outcomes with synthesized speech. Dual pipeline: ~400ms (OpenAI Realtime) or multi-provider (Claude, GPT, Gemini). Built entirely using AI-assisted development (Claude Code).</p>
+      </div>
+      <div class="project-item reveal reveal-delay-2">
         <h3>Real-time multiplayer game</h3>
         <p>Led a 3-person team building a cross-platform party game with Flutter, Dart, and Supabase. Designed a custom Stream-based architecture for real-time sync across mobile and web.</p>
       </div>
-      <div class="project-item reveal reveal-delay-2">
-        <h3>LLM recommender system</h3>
-        <p>Master's thesis. Used LLaMA3 for generation and RoBERTa for embeddings, with ChromaDB and cosine similarity for retrieval.</p>
-      </div>
       <div class="project-item reveal reveal-delay-1">
+        <h3>LLM recommender system</h3>
+        <p>Master&rsquo;s thesis. Used LLaMA3 for generation and RoBERTa for embeddings, with ChromaDB and cosine similarity for retrieval.</p>
+      </div>
+      <div class="project-item reveal reveal-delay-2">
         <h3>AAS Dashboard</h3>
         <p>React + TypeScript dashboard for managing Asset Administration Shells, containerized with Docker.</p>
       </div>
-      <div class="project-item reveal reveal-delay-2">
+      <div class="project-item reveal reveal-delay-1">
         <h3>Satellite image classification</h3>
         <p>ML pipeline with Python and Keras to classify building locations from satellite imagery.</p>
       </div>
