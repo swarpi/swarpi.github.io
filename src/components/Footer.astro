@@ -2,69 +2,37 @@
 const year = new Date().getFullYear();
 ---
 
-<footer>
-  <div class="footer-inner">
-    <div class="footer-left">
-      <span class="footer-name">swarpi</span>
-      <p class="copyright">&copy; {year} Trung Duc Nguyen</p>
-    </div>
-    <div class="footer-links">
-      <a href="https://github.com/swarpi" target="_blank" rel="noopener noreferrer">GitHub</a>
-      <a href="/rss.xml">RSS</a>
-      <a href="mailto:nguyendtrung15@gmail.com">Email</a>
-    </div>
+<footer class="foot">
+  <span class="mono">swarpi &middot; &copy; {year} Trung Duc Nguyen</span>
+  <div class="links">
+    <a class="mono" href="https://github.com/swarpi">GitHub</a>
+    <a class="mono" href="/rss.xml">RSS</a>
+    <a class="mono" href="mailto:nguyendtrung15@gmail.com">Email</a>
   </div>
 </footer>
 
 <style>
-  footer {
-    background-color: var(--color-footer-bg);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding: var(--space-lg) var(--space-md);
-  }
-
-  .footer-inner {
-    max-width: var(--max-width);
-    margin: 0 auto;
+  .foot {
+    margin-top: 80px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 13px;
   }
 
-  .footer-name {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--color-footer-heading);
-  }
-
-  .copyright {
-    color: var(--color-footer-text);
-    font-size: 0.875rem;
-    margin: 0.25rem 0 0;
-  }
-
-  .footer-links {
+  .links {
     display: flex;
-    gap: var(--space-sm);
+    gap: 18px;
   }
 
-  .footer-links a {
-    color: var(--color-footer-text);
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: color 0.2s ease;
+  .foot a {
+    color: var(--ink-3);
+    transition: color 0.15s;
   }
 
-  .footer-links a:hover {
-    color: var(--color-footer-heading);
-  }
-
-  @media (max-width: 576px) {
-    .footer-inner {
-      flex-direction: column;
-      gap: var(--space-sm);
-      text-align: center;
-    }
-  }
+  .foot a:hover { color: var(--ink); }
 </style>

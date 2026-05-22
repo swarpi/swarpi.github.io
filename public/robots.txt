@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://swarpi.github.io/sitemap-index.xml
+Sitemap: https://swarpi.com/sitemap-index.xml

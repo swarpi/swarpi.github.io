@@ -8,8 +8,6 @@ on:
     types:
       - workflow-updated
       - showcase-updated
-  schedule:
-    - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:

@@ -11,7 +11,7 @@ export async function GET(context: APIContext) {
   return rss({
     title: 'swarpi',
     description: 'Essays and notes on software engineering',
-    site: context.site ?? 'https://swarpi.github.io',
+    site: context.site ?? 'https://swarpi.com',
     items: sortedPosts.map((post) => ({
       title: post.data.title,
       description: post.data.description,

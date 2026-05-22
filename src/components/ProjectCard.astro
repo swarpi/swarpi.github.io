@@ -11,92 +11,127 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'short',
 });
+
+const thumbGradients: Record<string, string> = {
+  TypeScript: 'radial-gradient(120% 80% at 10% 0%, #2a2925 0%, #14140f 55%, #14140f 100%)',
+  Python: 'linear-gradient(135deg, #c9a187 0%, #a8442a 100%)',
+  Java: 'linear-gradient(160deg, #d8d6cf 0%, #b8b6ad 50%, #8e8c83 100%)',
+};
+const thumbBg = thumbGradients[project.language ?? ''] ?? 'linear-gradient(160deg, #d8d6cf 0%, #b8b6ad 50%, #8e8c83 100%)';
+
+const thumbClasses: Record<string, string> = {
+  TypeScript: 'ph-a',
+  Python: 'ph-b',
+};
+const phClass = thumbClasses[project.language ?? ''] ?? 'ph-c';
 ---
 
-<a href={project.url} target="_blank" rel="noopener noreferrer" class="project-card">
-  <div class="card-content">
-    <div class="card-top">
-      <div class="comp-section">
-        <h3>{project.name}</h3>
-        {project.language && (
-          <span class="status">{project.language}</span>
-        )}
-      </div>
-    </div>
-    <p class="description">{project.description}</p>
-    <span class="date">Updated {formattedDate}</span>
+<a href={`/projects/${project.name}`} class="proj-card">
+  <div class:list={['thumb', phClass]} style={`background: ${thumbBg};`}>
   </div>
+  <div class="meta">
+    <span>{formattedDate}</span>
+    {project.language && <span class="lang">{project.language}</span>}
+  </div>
+  <div class="row">
+    <h3>{project.name}</h3>
+    <span class="arr">&rarr;</span>
+  </div>
+  <p>{project.description}</p>
 </a>
 
 <style>
-  .project-card {
-    display: block;
-    border-radius: 12px;
-    background-color: var(--color-bg-alt);
-    color: var(--color-text);
-    transition: transform 0.4s ease;
-    overflow: hidden;
-    height: 100%;
-  }
-
-  .project-card:hover {
-    transform: scale(1.05);
-    text-decoration: none;
-    color: var(--color-text);
-  }
-
-  .card-content {
-    padding: var(--space-md);
+  .proj-card {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    gap: 14px;
+    color: var(--ink);
   }
 
-  .card-top {
-    margin-bottom: var(--space-sm);
+  .thumb {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .comp-section {
+  .proj-card:hover .thumb {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px -22px rgba(20,20,15,0.32);
+  }
+
+  .thumb.ph-a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNDAiIGhlaWdodD0iMjQwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IiBudW1PY3RhdmVzPSIyIiBzZWVkPSIzIi8+PGZlQ29sb3JNYXRyaXggdmFsdWVzPSIwIDAgMCAwIDEgMCAwIDAgMCAxIDAgMCAwIDAgMSAwIDAgMCAwLjE4IDAiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjI0MCIgZmlsdGVyPSJ1cmwoI24pIi8+PC9zdmc+');
+    background-size: 240px 240px;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .thumb.ph-b::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 14px);
+    pointer-events: none;
+  }
+
+  .thumb.ph-c::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(120% 80% at 90% 110%, rgba(255,255,255,0.5), transparent 60%);
+    pointer-events: none;
+  }
+
+  .meta {
     display: flex;
-    align-items: center;
-    gap: var(--space-sm);
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
   }
+
+  .meta .lang { color: var(--ink-3); }
 
   h3 {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink);
     margin: 0;
   }
 
-  .status {
+  p {
+    font-size: 14px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    margin: -6px 0 0;
+  }
+
+  .row {
     display: flex;
-    align-items: center;
-    padding: 0 8px;
-    height: 28px;
-    border: 1.5px solid var(--color-border);
-    border-radius: 100px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-dim);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
   }
 
-  .description {
-    color: var(--color-text-muted);
-    margin-bottom: auto;
-    padding-bottom: var(--space-sm);
-    font-size: 0.95rem;
-    font-weight: 500;
-    line-height: 1.6;
+  .arr {
+    color: var(--muted-2);
+    transition: transform 0.2s ease, color 0.2s ease;
   }
 
-  .date {
-    font-size: 0.8rem;
-    color: var(--color-text-dim);
-    font-weight: 600;
+  .proj-card:hover .arr {
+    transform: translateX(3px);
+    color: var(--ink);
   }
 </style>

@@ -1,66 +1,106 @@
 # Project
 
-This project uses a structured agentic engineering workflow. Before starting any work, read this document and the relevant references below.
+**swarpi.com** is Trung Duc Nguyen's personal portfolio site, built with **Astro 5** (static output), **React**, and **MDX**. It deploys to GitHub Pages with a custom domain at `https://swarpi.com`.
+
+The site includes:
+- **Home** — hero section + showcase projects (fetched from GitHub via the `showcase` topic)
+- **About** — career details sourced from `src/content/career.md`
+- **Projects** — dynamic routes from GitHub showcase repos
+- **Workflow** — interactive visualization of the agentic dev workflow
+- **Writing** — blog/articles (MDX content collection in `src/content/writing/`)
+- **Hub** — central navigation page
+
+Key tech: Astro content collections, React components, GitHub API integration (`src/lib/github`), RSS feed, sitemap. CI is a GitHub Actions workflow (`build-and-deploy.yml`) that builds and deploys to Pages.
+
+## Development
+
+```bash
+npm run dev      # local dev server
+npm run build    # astro check + build
+npm run preview  # preview production build
+```
 
 ## Workflow
 
-This project separates AI-assisted work into seven roles. Each role is a Claude Code subagent in `.claude/agents/` — invoke them via the Agent tool with `subagent_type: "<name>"` (e.g., `subagent_type: "architect"`). Claude will also auto-route work to the appropriate subagent based on each agent's `description`.
+This project uses a hybrid agentic workflow: specialized agents handle process (decisions, planning, review), and Claude Code's plan mode handles execution.
 
-| Role | Subagent | Responsibility |
-|------|----------|----------------|
-| **Architect** | `architect` | Analyze requirements, ask clarifying questions, produce ADRs |
-| **System Architect** | `system-architect` | Map and document system architecture as `architecture.yaml` |
-| **Planner** | `planner` | Decompose specs and ADRs into actionable tickets |
-| **Executor** | `executor` | Implement tickets, verify work before requesting feedback |
-| **QA Tester** | `qa-tester` | Write automated tests for completed features |
-| **Reviewer** | `reviewer` | Validate code and tests against acceptance criteria and ADRs |
-| **Custodian** | `custodian` | Keep CLAUDE.md lean (≤200 lines), current, and routed to external files |
+## Workflow — Hybrid Approach
 
-## Sub-Agent Deployment
+Agents own the **process** — architecture decisions, work decomposition, quality gates, and maintenance. Claude Code plan mode owns the **execution** — implementing individual tickets efficiently within a single session.
 
-When work can be parallelized, spin up sub-agents to handle independent tasks concurrently. Sub-agents research, test, or implement in isolation and report back to the main thread.
+| Phase | How | When |
+|-------|-----|------|
+| **Decide** | `/architect` agent | New feature, significant design choice, unclear requirements |
+| **Map** | `/system-architect` agent | New system or major structural change |
+| **Decompose** | `/planner` agent | ADR/spec ready, work needs to be broken into tickets |
+| **Execute** | Claude Code **plan mode** (`shift+tab`) | Implementing a specific ticket (includes writing tests) |
+| **Review** | `/reviewer` agent | Code and tests ready for validation |
+| **Learn** | `/learner` agent | Feature complete and introduced a new technology or concept |
+| **Report** | `/summarizer` agent | Sprint or feature complete, stakeholder update needed |
 
-### When to deploy sub-agents
+### Why hybrid?
 
-- **Research in parallel** — e.g., one sub-agent reads existing ADRs while another explores the codebase for relevant patterns
-- **Test in parallel** — e.g., one sub-agent runs unit tests while another checks integration tests
-- **Implement independent tickets** — tickets with no dependencies on each other can be executed simultaneously
-- **Verify in parallel** — e.g., one sub-agent checks browser behavior while another reviews console output
+- Agents enforce **separation of concerns** — the Architect can't write code, the Reviewer can't fix issues
+- Plan mode provides **speed and context continuity** — it explores, plans, and executes in one session
+- Artifacts (ADRs, tickets, reviews) **persist across sessions** — plan mode's output is code, agents' output is documentation
 
-### Model selection
+### Choosing the right tool
 
-Not every sub-agent needs the most powerful model. Choose the model based on task complexity:
+**Use an agent** when the task produces a persistent artifact (ADR, ticket, review, summary) or when role separation matters (the person deciding shouldn't be the person implementing).
 
-| Complexity | Model | Use when |
-|------------|-------|----------|
-| **Low** | Haiku | File lookups, grep searches, reading docs, running tests, formatting, simple code generation |
-| **Medium** | Sonnet | Multi-file changes, moderate reasoning, code review, writing tests |
-| **High** | Opus | Architecture decisions, complex refactors, subtle bug investigation, cross-cutting changes |
+**Use plan mode** when you have a well-scoped ticket with clear acceptance criteria and want to go from plan to working code in one session.
 
-**Default to Haiku for sub-agents** unless the task requires multi-step reasoning or cross-file understanding. Most research and verification tasks are Haiku-appropriate.
+**Quick fixes and bug fixes** don't need the full pipeline — use plan mode directly, or just implement without ceremony. The workflow exists to help, not to slow down trivial changes.
 
-### How to deploy
+## Before Starting Any Feature
 
-Use the Agent tool with these parameters:
-- `description` — Short label for what the sub-agent does
-- `prompt` — Self-contained brief (the sub-agent has no context from the main thread)
-- `model` — Set to `"haiku"` for simple tasks, `"sonnet"` for moderate, omit for complex (inherits parent model)
-- `run_in_background` — Set to `true` when you don't need the result before continuing other work
+1. Check if an ADR exists in `architecture/decisions/` — if not, run `/architect` first
+2. Check if tickets exist in `tickets/` — if not, run `/planner` first
+3. For each ticket: use plan mode (`shift+tab`) to implement it
+4. After implementation: run `/reviewer` to validate against acceptance criteria
+5. If the ticket touches an existing ADR's scope, verify the decision still holds
+6. If the feature introduced new technologies or concepts, run `/learner` for each one
 
-### Rules
+## After Completing a Feature
 
-- **Make prompts self-contained** — Sub-agents don't see the main conversation. Include file paths, context, and what specifically to do or find.
-- **Parallelize independent work** — Launch multiple sub-agents in a single message when their tasks don't depend on each other.
-- **Don't delegate synthesis** — Sub-agents gather information; the main thread makes decisions. Never write "based on your findings, decide X."
-- **Verify sub-agent output** — Sub-agents report what they intended, not necessarily what they achieved. Check their actual changes before reporting to the user.
+When a feature is done and introduces new technologies, patterns, or concepts the user hasn't worked with before — automatically invoke `/learner` for each new concept. Look for:
+- New libraries or frameworks added to dependencies
+- New architectural patterns (e.g., event sourcing, SSE, pub/sub)
+- New language features or APIs used for the first time
+- New infrastructure concepts (e.g., WebSockets, gRPC, CRDT)
 
-## Before Starting Any Ticket
+This ensures the user can confidently explain every technology in their project.
+
+## Testing in Plan Mode
+
+Plan mode writes tests as part of implementing each ticket. For every acceptance criterion:
+1. Write at least one automated test that verifies it
+2. Cover edge cases (empty, null, boundary values) and error handling
+3. Run the tests and confirm they pass before marking the ticket done
+
+Follow the project's existing test framework and patterns. Test observable behavior, not implementation details.
+
+## Before Starting Any Ticket (in plan mode)
 
 1. Read the ticket fully, including all linked documents
 2. Read any referenced ADRs in `architecture/decisions/`
-3. Check if there's a relevant spec in `specs/`
-4. Propose a plan before writing code — get alignment first
-5. If the ticket touches an existing ADR's scope, verify the decision still holds
+3. Check relevant conventions in `conventions/`
+4. Let plan mode explore and propose the implementation plan
+5. Verify the work end-to-end before marking done
+
+## Sub-Agent Deployment
+
+When work can be parallelized, spin up sub-agents for independent tasks concurrently.
+
+### Model selection
+
+| Complexity | Model | Use when |
+|------------|-------|----------|
+| **Low** | Haiku | File lookups, grep, reading docs, running tests, formatting |
+| **Medium** | Sonnet | Multi-file changes, code review, writing tests |
+| **High** | Opus | Architecture decisions, complex refactors, subtle bugs |
+
+**Default to Haiku** unless the task requires multi-step reasoning or cross-file understanding.
 
 ## Key Files and Directories
 
@@ -70,11 +110,33 @@ Use the Agent tool with these parameters:
 - `specs/` — Feature specifications
 - `tickets/` — Work items organized by feature folder, with `_backlog.md` as the sprint board
 - `conventions/` — Language and framework coding standards
-- `.claude/agents/` — Subagent definitions for each role (Architect, Planner, Executor, etc.)
+- `.claude/agents/` — Subagent definitions for each role
+- `STATUS.md` — Live project dashboard (auto-updated git data + manually maintained context)
+
+## CLAUDE.md Maintenance
+
+Keep this file lean and current (target: under 200 lines). A hook warns when it exceeds the limit.
+- When you discover a new gotcha or pattern, add it here or to the appropriate linked file
+- Route large or specialized content to separate files (e.g., `conventions/`, `docs/`) and link from here
+- Remove stale entries that no longer reflect how the project works
+- Never duplicate information that already lives in a linked file
+
+## STATUS.md Maintenance
+
+STATUS.md is a live project dashboard. Git sections (branch, commits, file changes) auto-update via a hook on every commit/push. You maintain the semantic sections:
+
+**Update after significant milestones** (completing a ticket, finishing a phase, hitting a blocker):
+1. **Current Phase** — Mark the active workflow phase(s) from the table
+2. **Active Work** — One paragraph: what feature/ticket is in progress, next step
+3. **Open Tickets** — Snapshot from `tickets/_backlog.md`
+4. **Risks & Blockers** — Add blockers; remove resolved ones
+5. **Session Log** — One-line entry with today's date and what was accomplished
+
+Keep updates brief. STATUS.md is a dashboard, not a report — use `/summarizer` for detailed retrospectives.
 
 ## MCP Servers
 
-- **Context7** — Pulls up-to-date, version-specific documentation from live code libraries (React, Next.js, etc.) before writing code. Configured in `.claude/settings.json`. Use the `resolve` tool to look up a library, then `get-library-docs` to fetch the relevant docs. Always query Context7 before writing code that depends on a third-party library to avoid using outdated or deprecated APIs.
+- **Context7** — Pulls up-to-date, version-specific documentation from live code libraries. Use `resolve` then `get-library-docs` before writing code that depends on a third-party library.
 
 ## Conventions
 
