@@ -4,320 +4,362 @@ import ProjectCard from '@/components/ProjectCard.astro';
 import { fetchShowcaseProjects } from '@/lib/github';
 
 const projects = await fetchShowcaseProjects();
+const projectCount = String(projects.length).padStart(2, '0');
 ---
 
 <BaseLayout title="Home">
-  <section class="jumbotron">
-    <div class="left">
-      <h2 class="reveal">Software</h2>
-      <h1 class="reveal reveal-delay-1">Engineer</h1>
-      <p class="subtitle reveal reveal-delay-2">
-        Building things with TypeScript, Python, and Java &mdash;
-        shipping agentic workflows and AI-powered applications with Claude Code.
-      </p>
-      <div class="socials reveal reveal-delay-3">
-        <a href="https://github.com/swarpi" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+  <header class="hero-grid">
+    <div class="hero-left">
+      <div class="kicker rotator" aria-label="Software / Agentic / Food / Game">
+        <span class="word">Software</span>
+      </div>
+      <h1 class="display">Engineer</h1>
+      <p class="sub">Building things with TypeScript, Python, and Java &mdash; shipping agentic workflows and AI-powered applications with Claude Code.</p>
+      <div class="icons">
+        <a href="https://github.com/swarpi" aria-label="GitHub" title="GitHub">
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.34.95.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .96-.31 3.16 1.18a10.97 10.97 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.4-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56 4.56-1.52 7.85-5.83 7.85-10.91C23.5 5.65 18.35.5 12 .5Z"/></svg>
         </a>
-        <a href="mailto:nguyendtrung15@gmail.com" aria-label="Email">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <a href="mailto:nguyendtrung15@gmail.com" aria-label="Email" title="Email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
         </a>
       </div>
     </div>
-    <div class="right">
-      <div class="right-content reveal">
-        <h3>Based in Berlin</h3>
-        <h4>M.Sc. Information Systems Management, TU Berlin</h4>
-        <p class="job-desc">
-          Currently building agentic developer tools and AI-powered applications using Claude Code.
-          Associate Engineer at Deutsche Bank, modernizing commercial banking on GCP.
-        </p>
-        <div class="quick-links">
-          <a href="/about">About me &rarr;</a>
+
+    <aside class="hero-right">
+      <h3>Based in Berlin</h3>
+      <h4>M.Sc. Information Systems Management, TU Berlin</h4>
+      <p>Currently building agentic developer tools and AI-powered applications using Claude Code.</p>
+      <p>Associate Engineer at Deutsche Bank, modernizing commercial banking on GCP.</p>
+      <div class="timeline">
+        <div class="timeline-col">
+          <span class="timeline-label">Current</span>
+          <span>Deutsche Bank</span>
+        </div>
+        <div class="timeline-col">
+          <span class="timeline-label">Past</span>
+          <span>TU Berlin &middot; cliqe &middot; Capgemini</span>
         </div>
       </div>
-    </div>
-  </section>
+      <a class="more" href="/about">About me &rarr;</a>
+    </aside>
+  </header>
 
-  <section class="home-projects">
-    <h2 class="reveal">Selected Work</h2>
-    <div class="home-card-container">
-      {projects.length > 0 ? (
-        projects.slice(0, 6).map((project, i) => (
-          <div class:list={['reveal', `reveal-delay-${(i % 3) + 1}`]}>
+  <section class="selected-work">
+    <div class="sec-head">
+      <h2>Selected Work</h2>
+      <span class="count">{projectCount} &middot; Active</span>
+    </div>
+
+    {projects.length > 0 ? (
+      <div class="proj-grid">
+        {projects.slice(0, 4).map((project, i) => (
+          <div class:list={['reveal', `reveal-delay-${(i % 2) + 1}`]}>
             <ProjectCard project={project} />
           </div>
-        ))
-      ) : (
-        <p class="empty reveal">Projects coming soon.</p>
-      )}
-    </div>
-    {projects.length > 0 && (
-      <div class="view-all reveal">
-        <a href="/projects">View all projects &rarr;</a>
+        ))}
       </div>
+    ) : (
+      <p class="empty reveal">Projects coming soon.</p>
+    )}
+
+    {projects.length > 0 && (
+      <a class="more-all" href="/projects">View all projects &rarr;</a>
     )}
   </section>
 
-  <section class="home-explore reveal">
-    <div class="explore-grid">
-      <a href="/workflow" class="explore-card">
-        <span class="explore-label">Explore</span>
-        <h3>My Workflow</h3>
-        <p>How I work with AI agents to build software</p>
-      </a>
-      <a href="/writing" class="explore-card">
-        <span class="explore-label">Read</span>
-        <h3>Writing</h3>
-        <p>Essays, notes, and thoughts</p>
-      </a>
-    </div>
-  </section>
+  <div class="cta-line">
+    <p>More on <a href="/workflow">how I work with AI agents</a>, explore the <a href="/hub">Project Hub</a>, or read <a href="/writing">essays &amp; working notes</a>.</p>
+  </div>
 </BaseLayout>
 
 <style>
-  /* Jumbotron — split hero matching taamannae.dev structure */
-  .jumbotron {
+  .hero-grid {
+    margin-top: 10vh;
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    margin-bottom: 0;
-    padding-bottom: 0;
-    min-height: 70vh;
-  }
-
-  .left {
-    border-right: 1px solid var(--color-border);
-    padding: var(--space-lg) var(--space-lg) var(--space-lg) 0;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 96px;
+    align-items: start;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding-bottom: 32px;
   }
 
-  .left h2 {
-    font-family: var(--font-body);
-    font-size: clamp(2.5rem, 5.5vw, 5rem);
-    font-weight: 800;
-    color: var(--color-text-muted);
-    margin: 0;
-    padding-bottom: 0;
-    line-height: 1;
-    overflow: hidden;
-  }
-
-  .left h1 {
-    font-size: clamp(3rem, 7vw, 7rem);
-    font-weight: 900;
-    font-variation-settings: 'opsz' 144, 'WONK' 1;
-    line-height: 0.9;
-    margin: 0 0 var(--space-md);
-    overflow: hidden;
-  }
-
-  .subtitle {
-    font-size: 1.1rem;
+  .hero-left .kicker {
+    font-family: 'Geist', sans-serif;
+    font-size: clamp(52px, 7vw, 108px);
     font-weight: 600;
-    color: var(--color-text-muted);
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+    margin-bottom: -0.1em;
+    display: inline-flex;
+    align-items: flex-start;
+    vertical-align: top;
+    overflow: hidden;
+    padding: 0.06em 0.06em;
+    margin-left: -0.06em;
+  }
+
+  .hero-left .kicker .word {
+    display: inline-block;
+    color: #8a8a82;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMjAiIGhlaWdodD0iMzIwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44NSIgbnVtT2N0YXZlcz0iMiIgc2VlZD0iNSIvPjxmZUNvbG9yTWF0cml4IHZhbHVlcz0iMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMSAwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMyMCIgaGVpZ2h0PSIzMjAiIGZpbGw9IiM5YTlhOTQiLz48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjMyMCIgZmlsdGVyPSJ1cmwoI24pIiBvcGFjaXR5PSIwLjUyIi8+PC9zdmc+');
+    background-size: 320px 320px;
+    background-repeat: repeat;
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+    will-change: transform;
+    transition: transform .48s cubic-bezier(.6, .02, .2, 1);
+  }
+
+  .hero-left .kicker .word.is-leaving  { transform: translateY(108%); }
+  .hero-left .kicker .word.is-entering { transform: translateY(-108%); }
+  .hero-left .kicker .word.no-anim     { transition: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-left .kicker .word { transition: opacity .18s ease; }
+    .hero-left .kicker .word.is-leaving,
+    .hero-left .kicker .word.is-entering { transform: none; opacity: 0; }
+  }
+
+  .hero-left .display {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(72px, 9.5vw, 144px);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: -0.015em;
+    line-height: 0.95;
+    margin-top: 0;
+    color: var(--ink);
+  }
+
+  .hero-left .sub {
+    margin-top: 56px;
+    font-size: 18px;
     line-height: 1.7;
-    max-width: 48ch;
-    margin-bottom: var(--space-md);
+    max-width: 540px;
+    color: var(--ink-3);
   }
 
-  .socials {
+  .hero-left .icons {
+    margin-top: 56px;
     display: flex;
-    gap: 4px;
-    margin-left: -8px;
+    gap: 22px;
   }
 
-  .socials a {
-    display: flex;
+  .hero-left .icons a {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 100px;
-    color: var(--color-text);
-    transition: background-color 0.3s ease;
+    width: 28px;
+    height: 28px;
+    color: var(--ink-2);
+    transition: color 0.15s, transform 0.15s;
   }
 
-  .socials a:hover {
-    background-color: var(--color-nav-hover);
+  .hero-left .icons a:hover { color: var(--ink); transform: translateY(-1px); }
+  .hero-left .icons svg { width: 22px; height: 22px; }
+
+  .hero-right {
+    position: relative;
+    padding-left: 32px;
+    border-left: 1px solid var(--rule);
   }
 
-  .right {
+  .hero-right h3 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin: 0 0 4px;
+  }
+
+  .hero-right h4 {
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.4;
+    color: var(--ink-3);
+    margin: 0 0 4px;
+    max-width: 320px;
+  }
+
+  .hero-right p {
+    font-size: 17px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    max-width: 360px;
+    margin-bottom: 0;
+  }
+
+  .timeline {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+  }
+
+  .timeline-col {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    padding: var(--space-lg) 0 var(--space-lg) var(--space-lg);
+    gap: 4px;
+    font-size: 15px;
+    color: var(--ink-3);
+    line-height: 1.45;
   }
 
-  .right h3 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1.5;
-    margin: 0 0 0;
+  .timeline-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
   }
 
-  .right h4 {
-    color: var(--color-text-muted);
-    font-size: 1.1rem;
-    font-weight: 600;
-    line-height: 1.6;
-    margin: 0 0 var(--space-sm);
+  .hero-right .more {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--ink);
+    transition: color 0.15s;
   }
 
-  .job-desc {
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.7;
-    margin-bottom: var(--space-sm);
+  .hero-right .more:hover { color: var(--accent); }
+
+  /* Selected Work */
+  .selected-work { margin-top: 40px; }
+
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 20px;
   }
 
-  .quick-links a {
-    font-weight: 700;
-    font-size: 1rem;
-    color: var(--color-text);
-    transition: all 0.3s ease;
+  .sec-head h2 {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin: 0;
   }
 
-  .quick-links a:hover {
-    color: var(--color-accent);
+  .count {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
-  /* Project cards section */
-  .home-projects {
-    padding: var(--space-xl) 0;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .home-projects h2 {
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    font-weight: 900;
-    margin: 0 0 var(--space-lg);
-  }
-
-  .home-card-container {
+  .proj-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
+    gap: 28px 24px;
   }
 
-  .view-all {
-    margin-top: var(--space-lg);
-    text-align: center;
-  }
-
-  .view-all a {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--color-text);
-    padding: 12px 32px;
-    border-radius: 100px;
-    border: 1px solid var(--color-border);
-    transition: all 0.3s ease;
+  .more-all {
+    margin-top: 28px;
     display: inline-block;
+    font-size: 14px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    transition: color .15s, border-color .15s;
   }
 
-  .view-all a:hover {
-    background-color: var(--color-nav-hover);
-    color: var(--color-text);
-  }
+  .more-all:hover { color: var(--accent); border-color: var(--accent); }
 
   .empty {
-    color: var(--color-text-muted);
+    color: var(--muted);
     grid-column: 1 / -1;
   }
 
-  /* Explore section */
-  .home-explore {
-    padding: var(--space-xl) 0 0;
-    border-top: 1px solid var(--color-border);
+  /* CTA line */
+  .cta-line {
+    margin-top: 80px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
   }
 
-  .explore-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
-  }
-
-  .explore-card {
-    display: block;
-    padding: var(--space-md) var(--space-md) var(--space-lg);
-    background-color: var(--color-bg-alt);
-    border-radius: 12px;
-    color: var(--color-text);
-    transition: transform 0.4s ease;
-  }
-
-  .explore-card:hover {
-    transform: scale(1.03);
-    text-decoration: none;
-    color: var(--color-text);
-  }
-
-  .explore-label {
-    display: inline-block;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-dim);
-    margin-bottom: var(--space-sm);
-  }
-
-  .explore-card h3 {
-    font-family: var(--font-display);
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0 0 var(--space-xs);
-  }
-
-  .explore-card p {
-    color: var(--color-text-muted);
-    font-size: 1rem;
-    font-weight: 500;
+  .cta-line p {
+    font-size: 15px;
+    color: var(--ink-3);
+    max-width: 480px;
+    line-height: 1.55;
     margin: 0;
   }
 
-  @media (max-width: 991px) {
-    .jumbotron {
+  .cta-line p a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink-3);
+    padding-bottom: 1px;
+    transition: border-color .15s, color .15s;
+  }
+
+  .cta-line p a:hover { color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .hero-grid {
       grid-template-columns: 1fr;
-      min-height: auto;
+      gap: 56px;
+      margin-top: 4vh;
+      padding-bottom: 32px;
     }
-
-    .left {
-      border-right: none;
-      padding: var(--space-lg) 0;
-    }
-
-    .right {
-      border-top: 1px solid var(--color-border);
-      padding: var(--space-lg) 0;
+    .hero-right {
+      padding-left: 0;
+      padding-top: 24px;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
     }
   }
 
-  @media (max-width: 768px) {
-    .home-card-container {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .explore-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .left h1 {
-      font-size: clamp(2.5rem, 10vw, 5rem);
-    }
-
-    .left h2 {
-      font-size: clamp(2rem, 8vw, 4rem);
-    }
+  @media (max-width: 900px) {
+    .proj-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
-  @media (max-width: 576px) {
-    .home-card-container {
-      grid-template-columns: 1fr;
-    }
+  @media (max-width: 640px) {
+    .proj-grid { grid-template-columns: 1fr; gap: 24px; }
   }
 </style>
+
+<script>
+  let _rotatorId: ReturnType<typeof setInterval> | undefined;
+
+  function initRotator() {
+    if (_rotatorId) clearInterval(_rotatorId);
+
+    const WORDS = ['Software', 'Agentic', 'Food', 'Game'];
+    const DWELL_MS = 2600;
+    const OUT_MS = 480;
+
+    const el = document.querySelector('.kicker.rotator .word') as HTMLElement | null;
+    if (!el) return;
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const outMs = reduced ? 160 : OUT_MS;
+    let i = 0;
+
+    function tick() {
+      el!.classList.add('is-leaving');
+      setTimeout(() => {
+        el!.classList.add('no-anim');
+        el!.classList.remove('is-leaving');
+        el!.classList.add('is-entering');
+        i = (i + 1) % WORDS.length;
+        el!.textContent = WORDS[i];
+        void el!.offsetHeight;
+        el!.classList.remove('no-anim');
+        requestAnimationFrame(() => {
+          el!.classList.remove('is-entering');
+        });
+      }, outMs);
+    }
+
+    _rotatorId = setInterval(tick, DWELL_MS);
+  }
+  initRotator();
+  document.addEventListener('astro:after-swap', initRotator);
+</script>

@@ -112,7 +112,14 @@ export async function fetchArchitecture(repoName: string): Promise<Architecture 
   }
 }
 
-export async function fetchProjectsWithOrchestrations(): Promise<ProjectWithOrchestration[]> {
+let _cachedProjects: Promise<ProjectWithOrchestration[]> | null = null;
+
+export function fetchProjectsWithOrchestrations(): Promise<ProjectWithOrchestration[]> {
+  if (!_cachedProjects) _cachedProjects = _fetchProjectsWithOrchestrationsImpl();
+  return _cachedProjects;
+}
+
+async function _fetchProjectsWithOrchestrationsImpl(): Promise<ProjectWithOrchestration[]> {
   const token = import.meta.env.GITHUB_TOKEN;
   const headers: HeadersInit = {
     Accept: 'application/vnd.github.v3+json',

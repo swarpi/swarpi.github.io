@@ -22,29 +22,26 @@ const fullTitle = title === 'Home' ? 'swarpi' : `${title} | swarpi`;
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" /></noscript>
     <title>{fullTitle}</title>
     <script is:inline>
       (function() {
-        var t = localStorage.getItem('theme');
-        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+        var a = localStorage.getItem('swarpi.accent');
+        if (a) document.documentElement.setAttribute('data-accent', a);
       })();
     </script>
   </head>
   <body>
-    <Header />
-    <main>
-      <slot />
-    </main>
-    <Footer />
-    <div class="grain" aria-hidden="true">
-      <svg width="0" height="0">
-        <filter id="grain-filter">
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-          <feColorMatrix type="saturate" values="0" />
-        </filter>
-      </svg>
+    <div class="wrap fade-in">
+      <Header />
+      <main>
+        <slot />
+      </main>
+      <Footer />
     </div>
+    <div class="grain" aria-hidden="true"></div>
     <script>
       function initReveal() {
         const observer = new IntersectionObserver(
@@ -61,6 +58,47 @@ const fullTitle = title === 'Home' ? 'swarpi' : `${title} | swarpi`;
       }
       initReveal();
       document.addEventListener('astro:after-swap', initReveal);
+    </script>
+    <script>
+      function initTweaks() {
+        const existing = document.querySelector('.tweaks');
+        if (existing) existing.remove();
+
+        const ACCENTS = [
+          { id: 'ink',        color: '#0a0a0a' },
+          { id: 'terracotta', color: '#b04a2a' },
+          { id: 'cobalt',     color: '#2c4a8a' },
+          { id: 'olive',      color: '#5a6f2e' },
+        ];
+        const KEY = 'swarpi.accent';
+
+        function apply(id: string) {
+          document.documentElement.dataset.accent = id;
+          try { localStorage.setItem(KEY, id); } catch {}
+          document.querySelectorAll('.tweaks .swatch').forEach((el) => {
+            (el as HTMLElement).classList.toggle('active', (el as HTMLElement).dataset.id === id);
+          });
+        }
+
+        const bar = document.createElement('div');
+        bar.className = 'tweaks';
+        bar.innerHTML =
+          '<span style="margin-right:4px;">Accent</span>' +
+          ACCENTS.map(
+            (a) =>
+              `<button class="swatch" data-id="${a.id}" style="background:${a.color}" title="${a.id}"></button>`
+          ).join('');
+        document.body.appendChild(bar);
+        bar.addEventListener('click', (e) => {
+          const s = (e.target as HTMLElement).closest('.swatch') as HTMLElement | null;
+          if (s) apply(s.dataset.id!);
+        });
+
+        const saved = localStorage.getItem(KEY);
+        apply(saved && ACCENTS.find((a) => a.id === saved) ? saved : 'ink');
+      }
+      initTweaks();
+      document.addEventListener('astro:after-swap', initTweaks);
     </script>
   </body>
 </html>

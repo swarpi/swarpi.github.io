@@ -1,172 +1,165 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import WorkflowProjectCard from '@/components/WorkflowProjectCard.astro';
-import { fetchProjectsWithOrchestrations } from '@/lib/orchestration';
-
-const projects = await fetchProjectsWithOrchestrations();
 ---
 
 <BaseLayout title="Workflow" description="How I work with AI agents to build software">
-  <section class="header">
-    <h1 class="reveal">Workflow</h1>
-    <p class="intro reveal reveal-delay-1">
-      How I work with AI agents to build software. Each project below defines an agent orchestration
-      — a pipeline of specialized roles that collaborate to ship code.
-    </p>
-    <p class="hint reveal reveal-delay-2">
-      Click any project to explore its agent pipeline and architecture graph.
-    </p>
-  </section>
+  <h1 class="greet reveal">How I work with <em>agents</em>.</h1>
+  <p class="lede reveal reveal-delay-1">
+    A loop, not a magic incantation. Each step exists because I've felt the cost of skipping it.
+  </p>
 
-  {projects.length > 0 ? (
-    <div class="workflow-grid">
-      {projects.map((project, i) => (
-        <div class:list={['reveal', `reveal-delay-${(i % 2) + 1}`]}>
-          <WorkflowProjectCard project={project} />
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p class="empty reveal">No showcase projects found.</p>
-  )}
-
-  <section class="workflow-info reveal">
-    <div class="info-grid">
-      <div class="info-card">
-        <div class="info-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4" />
-            <circle cx="12" cy="12" r="10" stroke-dasharray="4 3" />
-          </svg>
-        </div>
-        <h3>Agent Orchestration</h3>
-        <p>Each project can define a <code>orchestration.yaml</code> that specifies the agent roles, their responsibilities, and how they connect.</p>
-      </div>
-      <div class="info-card">
-        <div class="info-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7" rx="1.5" />
-            <rect x="14" y="3" width="7" height="7" rx="1.5" />
-            <rect x="8.5" y="14" width="7" height="7" rx="1.5" />
-            <path d="M10 10l-1.5 4M14 10l1.5 4" />
-          </svg>
-        </div>
-        <h3>System Architecture</h3>
-        <p>An <code>architecture.yaml</code> maps the runtime components, tiers, connections, and protocols of each project.</p>
-      </div>
-      <div class="info-card">
-        <div class="info-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5" />
-            <path d="M2 12l10 5 10-5" />
-          </svg>
-        </div>
-        <h3>Interactive Graphs</h3>
-        <p>Explore pannable, zoomable visualizations of the agent workflow and system architecture for each project.</p>
+  <div class="flow-steps">
+    <div class="flow-step reveal">
+      <div class="num">01</div>
+      <div>
+        <h3>Frame the change</h3>
+        <p>Before any model sees a prompt, I write what I'm trying to do, who it's for, and what "done" looks like. Two or three paragraphs in a scratchpad. If I can't write it down clearly, I'm not ready to ask an agent to do it.</p>
+        <div class="tools"><span>Markdown</span><span>scratchpad</span><span>linear</span></div>
       </div>
     </div>
-  </section>
+
+    <div class="flow-step reveal">
+      <div class="num">02</div>
+      <div>
+        <h3>Scout the codebase</h3>
+        <p>I let Claude Code read first and write later. The first session is always exploratory &mdash; list files, summarize modules, draft a plan with file paths attached. The output of this step is a written plan, not code.</p>
+        <div class="tools"><span>Claude Code</span><span>ripgrep</span><span>tree</span></div>
+      </div>
+    </div>
+
+    <div class="flow-step reveal">
+      <div class="num">03</div>
+      <div>
+        <h3>Tighten the scaffold</h3>
+        <p>Most agent failures are environment failures. I make sure types, tests, lints and CI run locally before the first edit, so the agent can self-correct against ground truth instead of vibes.</p>
+        <div class="tools"><span>pre-commit</span><span>vitest</span><span>mypy</span><span>biome</span></div>
+      </div>
+    </div>
+
+    <div class="flow-step reveal">
+      <div class="num">04</div>
+      <div>
+        <h3>Edit in small, reversible turns</h3>
+        <p>One feature, one branch, one commit per coherent change. The agent moves at the speed of the verifier; if I can't roll a turn back in one keystroke I've made it too big.</p>
+        <div class="tools"><span>git worktree</span><span>jujutsu</span></div>
+      </div>
+    </div>
+
+    <div class="flow-step reveal">
+      <div class="num">05</div>
+      <div>
+        <h3>Verify, then trust</h3>
+        <p>Tests for the happy path. Property-based or fuzz tests for the boundary. A human reading of anything touching auth, money, or destructive state. Trust scales <em>after</em> verification, never before.</p>
+        <div class="tools"><span>hypothesis</span><span>fast-check</span></div>
+      </div>
+    </div>
+
+    <div class="flow-step reveal">
+      <div class="num">06</div>
+      <div>
+        <h3>Capture the recipe</h3>
+        <p>If a workflow worked once, I write it down as a skill or recipe so the next session starts further along. Over time these compound into <a href="/projects">agent-eng</a>.</p>
+        <div class="tools"><span>agent-eng</span><span>Claude skills</span></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="closing reveal">
+    None of this is rocket science. It's just the part most demos skip &mdash; and the part that turns a flashy autocomplete into something you'd actually let near production code.
+  </p>
 </BaseLayout>
 
 <style>
-  .header {
-    margin-bottom: var(--space-xl);
+  .greet {
+    margin-top: 6vh;
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 3.8vw, 48px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink);
   }
 
-  h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 900;
-    font-variation-settings: 'opsz' 144, 'WONK' 1;
-    margin-top: 0;
-    margin-bottom: var(--space-sm);
-    line-height: 0.95;
+  .greet em { font-style: italic; color: var(--ink); }
+
+  .lede {
+    margin-top: 18px;
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 560px;
+    color: var(--ink-3);
   }
 
-  .intro {
-    color: var(--color-text-muted);
-    font-weight: 600;
-    font-size: 1.1rem;
-    max-width: 55ch;
-    line-height: 1.7;
-    margin-bottom: var(--space-xs);
-  }
+  .flow-steps { margin-top: 48px; }
 
-  .hint {
-    color: var(--color-text-dim);
-    font-weight: 600;
-    font-size: 0.95rem;
-  }
-
-  .workflow-grid {
+  .flow-step {
+    margin-top: 48px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
-    margin-bottom: var(--space-xl);
+    grid-template-columns: 80px 1fr;
+    gap: 24px;
+    align-items: baseline;
   }
 
-  .empty {
-    color: var(--color-text-muted);
-    font-style: italic;
-    margin-bottom: var(--space-xl);
+  .flow-step:first-child { margin-top: 0; }
+
+  .num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0;
   }
 
-  .workflow-info {
-    border-top: 1px solid var(--color-border);
-    padding-top: var(--space-lg);
-  }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-  }
-
-  .info-card {
-    padding: var(--space-md);
-    background-color: var(--color-bg-alt);
-    border-radius: 12px;
-    transition: transform 0.4s ease;
-  }
-
-  .info-card:hover {
-    transform: scale(1.03);
-  }
-
-  .info-icon {
-    color: var(--color-text-dim);
-    margin-bottom: var(--space-sm);
-  }
-
-  .info-card h3 {
-    font-family: var(--font-body);
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin: 0 0 var(--space-xs);
-  }
-
-  .info-card p {
-    color: var(--color-text-muted);
-    font-size: 0.95rem;
+  .flow-step h3 {
+    font-size: 20px;
     font-weight: 500;
-    margin: 0;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  .flow-step p {
+    font-size: 16px;
+    color: var(--ink-2);
     line-height: 1.6;
+    max-width: 560px;
+    margin: 0;
   }
 
-  .info-card code {
-    font-size: 0.85em;
-    background-color: var(--color-border);
-    padding: 2px 6px;
+  .flow-step a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .flow-step a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .tools {
+    margin-top: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tools span {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    padding: 3px 9px;
+    border: 1px solid var(--rule);
     border-radius: 4px;
+    color: var(--ink-3);
   }
 
-  @media (max-width: 768px) {
-    .workflow-grid {
-      grid-template-columns: 1fr;
-    }
+  .closing {
+    margin-top: 96px;
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 560px;
+    color: var(--ink-3);
+  }
 
-    .info-grid {
-      grid-template-columns: 1fr;
-    }
+  @media (max-width: 700px) {
+    .flow-step { grid-template-columns: 1fr; gap: 8px; }
   }
 </style>

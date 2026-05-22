@@ -6,94 +6,143 @@ const posts = await getCollection('writing', ({ data }) => !data.private);
 const sortedPosts = posts.sort(
   (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
 );
+
+function estimateReadTime(post: typeof sortedPosts[number]): number {
+  const words = post.body?.split(/\s+/).length ?? 0;
+  return Math.max(1, Math.ceil(words / 250));
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+}
 ---
 
-<BaseLayout title="Writing" description="Essays and notes">
-  <section class="header">
-    <h1 class="reveal">Writing</h1>
-    <p class="intro reveal reveal-delay-1">Essays, notes, and thoughts on software engineering.</p>
-  </section>
+<BaseLayout title="Writing" description="Essays and notes on software engineering">
+  <h1 class="greet reveal">Writing &amp; <em>notes</em>.</h1>
+  <p class="lede reveal reveal-delay-1">Essays, working notes, and the occasional rant. Mostly about agent engineering, occasionally about espresso.</p>
 
   {sortedPosts.length > 0 ? (
-    <ul class="post-list">
-      {sortedPosts.map((post, i) => (
-        <li class:list={['reveal', `reveal-delay-${(i % 2) + 1}`]}>
-          <a href={`/writing/${post.slug}`} class="post-link">
-            <span class="post-title">{post.data.title}</span>
-            <span class="post-date">
-              {post.data.publishedAt.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-              })}
-            </span>
-          </a>
-        </li>
+    <section class="write-section">
+      <div class="sec-head reveal">
+        <h2>Essays</h2>
+        <span class="count">{String(sortedPosts.length).padStart(2, '0')} &middot; {sortedPosts.length > 0 ? `${sortedPosts[sortedPosts.length - 1].data.publishedAt.getFullYear()}–${sortedPosts[0].data.publishedAt.getFullYear()}` : ''}</span>
+      </div>
+      {sortedPosts.map((post) => (
+        <a class="write-row reveal" href={`/writing/${post.slug}`}>
+          <span class="date">{formatDate(post.data.publishedAt)}</span>
+          <div>
+            <h3>{post.data.title}</h3>
+            {post.data.description && <p>{post.data.description}</p>}
+          </div>
+          <span class="read">{estimateReadTime(post)} min</span>
+        </a>
       ))}
-    </ul>
+    </section>
   ) : (
     <p class="empty reveal">No posts yet. Check back soon.</p>
   )}
 </BaseLayout>
 
 <style>
-  .header {
-    margin-bottom: var(--space-xl);
+  .greet {
+    margin-top: 6vh;
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 3.8vw, 48px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink);
   }
 
-  h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 900;
-    font-variation-settings: 'opsz' 144, 'WONK' 1;
-    margin-top: 0;
-    margin-bottom: var(--space-sm);
-    line-height: 0.95;
+  .greet em { font-style: italic; color: var(--ink); }
+
+  .lede {
+    margin-top: 18px;
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 560px;
+    color: var(--ink-3);
   }
 
-  .intro {
-    color: var(--color-text-muted);
-    font-weight: 600;
-    font-size: 1.1rem;
-  }
+  .write-section { margin-top: 64px; }
 
-  .post-list {
-    list-style: none;
-    padding: 0;
-  }
-
-  .post-list li {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .post-link {
+  .sec-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: var(--space-sm) 0;
-    color: var(--color-text);
-    transition: all 0.3s ease;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 0;
   }
 
-  .post-link:hover {
-    color: var(--color-accent);
-    text-decoration: none;
-    padding-left: 8px;
+  .sec-head h2 {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin: 0;
   }
 
-  .post-title {
-    font-weight: 700;
-    font-size: 1.1rem;
+  .count {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
-  .post-date {
-    color: var(--color-text-dim);
-    font-size: 0.875rem;
-    font-weight: 600;
-    flex-shrink: 0;
-    margin-left: var(--space-sm);
+  .write-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 70px;
+    gap: 24px;
+    padding: 18px 12px;
+    margin: 0 -12px;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+    transition: background 0.15s;
+    color: var(--ink);
+  }
+
+  .write-row:hover {
+    background: var(--paper-2);
+  }
+
+  .date {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .write-row h3 {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .write-row p {
+    font-size: 14px;
+    color: var(--ink-3);
+    margin-top: 3px;
+    line-height: 1.45;
+    margin-bottom: 0;
+  }
+
+  .read {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
   }
 
   .empty {
-    color: var(--color-text-muted);
-    font-style: italic;
+    color: var(--muted);
+    margin-top: 64px;
+  }
+
+  @media (max-width: 640px) {
+    .write-row { grid-template-columns: 1fr; gap: 4px; }
+    .date, .read { display: none; }
   }
 </style>

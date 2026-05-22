@@ -4,71 +4,190 @@ import ProjectCard from '@/components/ProjectCard.astro';
 import { fetchShowcaseProjects } from '@/lib/github';
 
 const projects = await fetchShowcaseProjects();
+const featured = projects.slice(0, 2);
+const archive = projects.slice(2);
 ---
 
 <BaseLayout title="Projects" description="Open source work and experiments">
-  <section class="header">
-    <h1 class="reveal">Projects</h1>
-    <p class="intro reveal reveal-delay-1">
-      Open source work and experiments. These are repositories I've tagged with
-      <code>showcase</code> on GitHub.
-    </p>
-  </section>
+  <h1 class="greet reveal">Projects &mdash; <em>side things, mostly</em>.</h1>
+  <p class="lede reveal reveal-delay-1">Small, intentional tools. Each one is a hypothesis about how to work better with AI agents.</p>
 
-  {projects.length > 0 ? (
-    <div class="project-grid">
-      {projects.map((project, i) => (
-        <div class:list={['reveal', `reveal-delay-${(i % 3) + 1}`]}>
-          <ProjectCard project={project} />
-        </div>
+  {featured.length > 0 && (
+    <section class="featured-section">
+      <div class="sec-head reveal">
+        <h2>Featured</h2>
+        <span class="count">{String(featured.length).padStart(2, '0')} &middot; agentic engineering</span>
+      </div>
+      <div class="proj-grid">
+        {featured.map((project, i) => (
+          <div class:list={['reveal', `reveal-delay-${i + 1}`]}>
+            <ProjectCard project={project} />
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {archive.length > 0 && (
+    <section class="archive-section">
+      <div class="sec-head reveal">
+        <h2>Earlier &amp; small</h2>
+        <span class="count">{String(archive.length).padStart(2, '0')} &middot; archive</span>
+      </div>
+      {archive.map((project) => (
+        <a class="proj reveal" href={`/projects/${project.name}`}>
+          <span class="year">{project.updatedAt.getFullYear()}</span>
+          <div>
+            <h3><em>{project.name}</em></h3>
+            {project.description && <p>{project.description}</p>}
+          </div>
+          <span class="lang">{project.language ?? ''}</span>
+          <span class="arr">&rarr;</span>
+        </a>
       ))}
-    </div>
-  ) : (
+    </section>
+  )}
+
+  {projects.length === 0 && (
     <p class="empty reveal">No showcase projects yet. Check back soon.</p>
   )}
+
+  <p class="lede closing reveal">Everything else lives on <a href="https://github.com/swarpi">GitHub</a>.</p>
 </BaseLayout>
 
 <style>
-  .header {
-    margin-bottom: var(--space-xl);
+  .greet {
+    margin-top: 6vh;
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 3.8vw, 48px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    color: var(--ink);
   }
 
-  h1 {
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 900;
-    font-variation-settings: 'opsz' 144, 'WONK' 1;
-    margin-top: 0;
-    margin-bottom: var(--space-sm);
-    line-height: 0.95;
+  .greet em { font-style: italic; color: var(--ink); }
+
+  .lede {
+    margin-top: 18px;
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 560px;
+    color: var(--ink-3);
   }
 
-  .intro {
-    color: var(--color-text-muted);
-    font-weight: 600;
-    font-size: 1.1rem;
-    max-width: 50ch;
+  .lede a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
   }
 
-  .project-grid {
+  .lede a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .closing { margin-top: 80px; }
+
+  .featured-section { margin-top: 64px; }
+  .archive-section { margin-top: 96px; }
+
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 20px;
+  }
+
+  .sec-head h2 {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .count {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .proj-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 24px;
   }
+
+  /* Archive rows */
+  .proj {
+    display: grid;
+    grid-template-columns: 110px 1fr 90px 28px;
+    gap: 24px;
+    padding: 18px 12px;
+    margin: 0 -12px;
+    border-bottom: 1px solid var(--rule);
+    align-items: baseline;
+    transition: background 0.15s;
+    color: var(--ink);
+  }
+
+  .proj:hover {
+    background: var(--paper-2);
+  }
+
+  .proj h3 {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .proj p {
+    font-size: 14px;
+    color: var(--ink-3);
+    margin-top: 3px;
+    line-height: 1.45;
+    margin-bottom: 0;
+  }
+
+  .year {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .lang {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: right;
+    letter-spacing: 0.04em;
+  }
+
+  .arr {
+    color: var(--muted-2);
+    transition: transform 0.2s, color 0.2s;
+    text-align: right;
+    font-size: 14px;
+  }
+
+  .proj:hover .arr { transform: translateX(3px); color: var(--ink); }
 
   .empty {
-    color: var(--color-text-muted);
-    font-style: italic;
+    color: var(--muted);
+    margin-top: 64px;
   }
 
-  @media (max-width: 1048px) {
-    .project-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 640px) {
-    .project-grid {
-      grid-template-columns: 1fr;
-    }
+  @media (max-width: 700px) {
+    .proj-grid { grid-template-columns: 1fr; gap: 24px; }
+    .proj { grid-template-columns: 1fr; gap: 4px; padding: 16px 0; }
+    .proj .lang, .proj .arr { display: none; }
   }
 </style>

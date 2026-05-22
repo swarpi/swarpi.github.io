@@ -29,7 +29,6 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
 
 <BaseLayout title={project.name} description={project.description}>
   <article class="hub">
-    <!-- Back -->
     <a href="/workflow" class="back reveal">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         <path d="M9 3L5 7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -37,7 +36,6 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
       Workflow
     </a>
 
-    <!-- Hero -->
     <header class="hero reveal">
       <h1>{project.name}</h1>
       <p class="lead">{project.description}</p>
@@ -50,7 +48,6 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
       </div>
     </header>
 
-    <!-- Agent Pipeline -->
     {hasOrchestration && project.orchestration && (
       <section class="section reveal reveal-delay-1">
         <h2>Agent Pipeline</h2>
@@ -89,7 +86,6 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
       </section>
     )}
 
-    <!-- Architecture -->
     {hasArchitecture && project.architecture && (
       <section class="section reveal reveal-delay-2">
         <h2>System Architecture</h2>
@@ -138,119 +134,111 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
     max-width: 860px;
   }
 
-  /* Back link */
   .back {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-dim);
-    margin-bottom: var(--space-lg);
-    transition: color 0.2s ease;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 64px;
+    transition: color 0.15s;
   }
 
-  .back:hover {
-    color: var(--color-text);
-    text-decoration: none;
-  }
+  .back:hover { color: var(--ink); }
 
-  /* Hero */
   .hero {
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-lg);
-    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 96px;
+    padding-bottom: 64px;
+    border-bottom: 1px solid var(--rule);
   }
 
   .hero h1 {
+    font-family: var(--font-serif);
     font-size: clamp(2.5rem, 6vw, 4.5rem);
-    font-weight: 800;
-    font-variation-settings: 'opsz' 144, 'WONK' 1;
+    font-weight: 400;
     margin-top: 0;
-    margin-bottom: var(--space-sm);
-    line-height: 0.95;
+    margin-bottom: 16px;
+    line-height: 1.05;
   }
 
   .lead {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--ink-3);
     max-width: 55ch;
     line-height: 1.7;
-    margin-bottom: var(--space-md);
+    margin-bottom: 32px;
   }
 
   .meta {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm);
+    gap: 16px;
     align-items: center;
   }
 
   .badge {
-    font-weight: 700;
+    font-family: var(--font-mono);
+    font-weight: 500;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--color-text-dim);
-    background-color: var(--color-bg-alt);
+    color: var(--muted);
+    background-color: var(--paper-2);
     padding: 6px 14px;
     border-radius: 100px;
-    border: 1.5px solid var(--color-border);
+    border: 1px solid var(--rule);
   }
 
   .date {
+    font-family: var(--font-mono);
     font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-dim);
+    font-weight: 400;
+    color: var(--muted);
   }
 
   .gh-link {
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 500;
     padding: 6px 16px;
     border-radius: 100px;
-    border: 1.5px solid var(--color-border);
-    color: var(--color-text-dim);
-    transition: all 0.2s ease;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    transition: color 0.15s, border-color 0.15s;
   }
 
   .gh-link:hover {
-    color: var(--color-text);
-    border-color: var(--color-text-dim);
-    text-decoration: none;
+    color: var(--ink);
+    border-color: var(--ink-3);
   }
 
-  /* Sections */
   .section {
-    margin-bottom: var(--space-xl);
+    margin-bottom: 96px;
   }
 
   .section h2 {
-    font-family: var(--font-display);
     font-size: clamp(1.5rem, 3vw, 2rem);
-    font-weight: 700;
-    font-variation-settings: 'opsz' 72, 'WONK' 1;
+    font-weight: 600;
     margin-top: 0;
-    margin-bottom: var(--space-xs);
+    margin-bottom: 8px;
   }
 
   .section-lead {
-    color: var(--color-text-muted);
-    font-weight: 500;
+    color: var(--ink-3);
+    font-weight: 400;
     font-size: 1rem;
     line-height: 1.7;
-    margin-bottom: var(--space-lg);
-    padding-left: var(--space-sm);
-    border-left: 3px solid var(--color-border);
+    margin-bottom: 64px;
+    padding-left: 16px;
+    border-left: 3px solid var(--rule);
   }
 
-  /* Pipeline */
   .pipeline {
     display: flex;
     flex-direction: column;
     position: relative;
-    margin-bottom: var(--space-lg);
+    margin-bottom: 64px;
   }
 
   .pipeline::before {
@@ -260,13 +248,13 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
     top: 28px;
     bottom: 28px;
     width: 1px;
-    background: var(--color-border);
+    background: var(--rule);
   }
 
   .pipeline-item {
     display: flex;
-    gap: var(--space-md);
-    padding: var(--space-sm) 0;
+    gap: 32px;
+    padding: 16px 0;
   }
 
   .pipeline-marker {
@@ -280,9 +268,9 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
   .index {
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--color-text-dim);
-    background: var(--color-bg);
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--paper);
     position: relative;
     z-index: 1;
     padding: 2px 0;
@@ -294,16 +282,15 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
   }
 
   .pipeline-body h3 {
-    font-family: var(--font-body);
     font-size: 1.1rem;
-    font-weight: 700;
+    font-weight: 600;
     margin: 0 0 4px;
   }
 
   .pipeline-body p {
-    color: var(--color-text-muted);
+    color: var(--ink-3);
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.6;
     margin: 0 0 8px;
   }
@@ -319,23 +306,22 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
     font-size: 0.65rem;
     padding: 3px 10px;
     border-radius: 100px;
-    background: var(--color-bg-alt);
-    color: var(--color-text-dim);
-    border: 1px solid var(--color-border);
+    background: var(--paper-2);
+    color: var(--muted);
+    border: 1px solid var(--rule);
   }
 
-  /* Architecture */
   .arch-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    gap: 16px;
+    margin-bottom: 64px;
   }
 
   .arch-item {
-    background: var(--color-bg-alt);
-    border-radius: 12px;
-    padding: var(--space-sm) var(--space-md);
+    background: var(--paper-2);
+    border-radius: 8px;
+    padding: 16px 32px;
   }
 
   .arch-header {
@@ -346,25 +332,24 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
   }
 
   .arch-header h3 {
-    font-family: var(--font-body);
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: 600;
     margin: 0;
   }
 
   .tier {
     font-family: var(--font-mono);
     font-size: 0.6rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--color-text-dim);
+    color: var(--muted);
   }
 
   .arch-desc {
-    color: var(--color-text-muted);
+    color: var(--ink-3);
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.6;
     margin: 0 0 4px;
   }
@@ -372,13 +357,13 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
   .tech {
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    color: var(--color-text-dim);
+    color: var(--muted);
   }
 
   .subs {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--rule);
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -386,45 +371,33 @@ const formattedDate = project.updatedAt.toLocaleDateString('en-US', {
 
   .sub {
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 400;
     line-height: 1.5;
-    color: var(--color-text-dim);
+    color: var(--muted);
   }
 
   .sub-name {
-    font-weight: 700;
-    color: var(--color-text-muted);
+    font-weight: 600;
+    color: var(--ink-3);
   }
 
-  /* Graph placeholder */
   .graph-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     height: 120px;
-    border: 2px dashed var(--color-border);
-    border-radius: 12px;
-    color: var(--color-text-dim);
+    border: 2px dashed var(--rule);
+    border-radius: 8px;
+    color: var(--muted);
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 400;
   }
 
   @media (max-width: 640px) {
-    .hub {
-      max-width: 100%;
-    }
-
-    .pipeline-marker {
-      width: 30px;
-    }
-
-    .pipeline::before {
-      left: 14px;
-    }
-
-    .pipeline-item {
-      gap: var(--space-sm);
-    }
+    .hub { max-width: 100%; }
+    .pipeline-marker { width: 30px; }
+    .pipeline::before { left: 14px; }
+    .pipeline-item { gap: 16px; }
   }
 </style>

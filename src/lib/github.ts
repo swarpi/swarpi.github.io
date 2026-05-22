@@ -18,7 +18,14 @@ export interface ShowcaseProject {
   readme: string | null;
 }
 
-export async function fetchShowcaseProjects(): Promise<ShowcaseProject[]> {
+let _cached: Promise<ShowcaseProject[]> | null = null;
+
+export function fetchShowcaseProjects(): Promise<ShowcaseProject[]> {
+  if (!_cached) _cached = _fetchShowcaseProjectsImpl();
+  return _cached;
+}
+
+async function _fetchShowcaseProjectsImpl(): Promise<ShowcaseProject[]> {
   const token = import.meta.env.GITHUB_TOKEN;
   const headers: HeadersInit = {
     Accept: 'application/vnd.github.v3+json',
@@ -48,12 +55,11 @@ export async function fetchShowcaseProjects(): Promise<ShowcaseProject[]> {
       try {
         const readmeResponse = await fetch(
           `https://api.github.com/repos/swarpi/${repo.name}/readme`,
-          { headers }
+          { headers: { ...headers, Accept: 'application/vnd.github.v3.html' } }
         );
 
         if (readmeResponse.ok) {
-          const readmeData = await readmeResponse.json();
-          readme = atob(readmeData.content);
+          readme = await readmeResponse.text();
         }
       } catch {
         // README fetch failed, continue without it
